@@ -1,5 +1,6 @@
 package net.vercte.lushcreeper.creeper;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Creeper;

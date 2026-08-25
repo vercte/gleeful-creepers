@@ -6,7 +6,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -28,10 +27,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 public class LushCreeper extends Monster {
+    private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.BOOLEAN);
     private int oldSwell = 0;
     private int swell = 0;
-    private int maxSwell = 60;
+    private int maxSwell = 30;
 
     public LushCreeper(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -43,23 +43,23 @@ public class LushCreeper extends Monster {
             this.oldSwell = this.swell;
 
             boolean ignited = this.isIgnited();
+            if(ignited) this.setSwellDir(1);
 
-            if(ignited) {
-                if (this.swell == 0) {
-                    this.playSound(SoundEvents.CREEPER_PRIMED, 1.0F, 0.5F);
-                    this.gameEvent(GameEvent.PRIME_FUSE);
-                }
+            int swellDir = this.getSwellDir();
 
-                this.swell += 1;
-                if(this.getLastHurtByMob() != null && this.getLastHurtByMob().distanceToSqr(this) < 6.25) this.swell += 1;
-                if (this.swell < 0) {
-                    this.swell = 0;
-                }
+            if (swellDir == 1 && this.swell == 0) {
+                this.playSound(SoundEvents.CREEPER_PRIMED, 1.0F, 0.5F);
+                this.gameEvent(GameEvent.PRIME_FUSE);
+            }
 
-                if (this.swell >= this.maxSwell) {
-                    this.swell = this.maxSwell;
-                    this.explodeCreeper();
-                }
+            this.swell += swellDir;
+            if (this.swell < 0) {
+                this.swell = 0;
+            }
+
+            if (this.swell >= this.maxSwell) {
+                this.swell = this.maxSwell;
+                this.explodeCreeper();
             }
         }
 
@@ -95,13 +95,6 @@ public class LushCreeper extends Monster {
     }
 
     @Override
-    public boolean hurt(@NotNull DamageSource source, float f) {
-        this.ignite();
-
-        return super.hurt(source, f);
-    }
-
-    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new SmileGoal(this));
@@ -115,22 +108,34 @@ public class LushCreeper extends Monster {
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
     }
 
+    public void ignite() {
+        this.entityData.set(DATA_IS_IGNITED, true);
+    }
+
     public boolean isIgnited() {
         return this.entityData.get(DATA_IS_IGNITED);
     }
-    public void ignite() { this.entityData.set(DATA_IS_IGNITED, true); }
+
+    public void setSwellDir(int dir) {
+        this.entityData.set(DATA_SWELL_DIR, dir);
+    }
+
+    public int getSwellDir() {
+        return this.entityData.get(DATA_SWELL_DIR);
+    }
+
+    protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_SWELL_DIR, 0);
+        builder.define(DATA_IS_IGNITED, false);
+    }
 
     public float getSwelling(float pt) {
         return Mth.lerp(pt, (float)this.oldSwell, (float)this.swell) / (float)(this.maxSwell - 2);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.25F);
-    }
-
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DATA_IS_IGNITED, false);
+        return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.25F).add(Attributes.MAX_HEALTH, 10);
     }
 
     @NotNull
@@ -147,17 +152,13 @@ public class LushCreeper extends Monster {
         super.addAdditionalSaveData(tag);
 
         tag.putShort("Fuse", (short)this.maxSwell);
-        tag.putBoolean("ignited", this.isIgnited());
+        tag.putBoolean("Ignited", this.isIgnited());
     }
 
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.contains("Fuse", 99)) {
-            this.maxSwell = tag.getShort("Fuse");
-        }
 
-        if (tag.getBoolean("ignited")) {
-            this.ignite();
-        }
+        if(tag.contains("Fuse", 99)) this.maxSwell = tag.getShort("Fuse");
+        if(tag.getBoolean("Ignited")) this.ignite();
     }
 }

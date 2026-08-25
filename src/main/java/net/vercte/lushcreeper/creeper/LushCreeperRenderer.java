@@ -6,12 +6,15 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.monster.Creeper;
 import net.vercte.lushcreeper.LushCreeperMod;
 import org.jetbrains.annotations.NotNull;
 
 public class LushCreeperRenderer extends MobRenderer<LushCreeper, LushCreeperModel> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(LushCreeperMod.at("lush_creeper"), "main");
+
+    private static final ResourceLocation HAPPY_TEXTURE = LushCreeperMod.at("textures/entity/lush_creeper/happy.png");
+    private static final ResourceLocation NEUTRAL_TEXTURE = LushCreeperMod.at("textures/entity/lush_creeper/neutral.png");
+    private static final ResourceLocation UNHAPPY_TEXTURE = LushCreeperMod.at("textures/entity/lush_creeper/unhappy.png");
 
     public LushCreeperRenderer(EntityRendererProvider.Context context, LushCreeperModel model) {
         super(context, model, 0.5f);
@@ -40,13 +43,9 @@ public class LushCreeperRenderer extends MobRenderer<LushCreeper, LushCreeperMod
     }
 
     @Override
-    protected float getShadowRadius(LushCreeper p_316170_) {
-        return super.getShadowRadius(p_316170_);
-    }
-
-    @Override
     @NotNull
     public ResourceLocation getTextureLocation(@NotNull LushCreeper lushCreeper) {
-        return LushCreeperMod.at("textures/entity/lush_creeper.png");
+        if(lushCreeper.hurtTime > 0) return NEUTRAL_TEXTURE;
+        return HAPPY_TEXTURE;
     }
 }

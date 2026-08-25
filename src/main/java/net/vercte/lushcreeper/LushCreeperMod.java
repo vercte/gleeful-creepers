@@ -47,7 +47,7 @@ public class LushCreeperMod {
 
     public static final Supplier<EntityType<LushCreeper>> LUSH_CREEPER = ENTITY_TYPES.register(
             "lush_creeper",
-            () -> EntityType.Builder.of(LushCreeper::new, MobCategory.MONSTER).sized(0.6f, 1.4f).clientTrackingRange(8)
+            () -> EntityType.Builder.of(LushCreeper::new, MobCategory.MONSTER).sized(0.6f, 1.5f).clientTrackingRange(8).eyeHeight(1.25f)
                     .build("lush_creeper:lush_creeper")
     );
 

@@ -1,17 +1,17 @@
-package net.vercte.lushcreeper.util.datagen.assets;
+package net.vercte.gleefulcreepers.util.datagen.assets;
 
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.vercte.lushcreeper.LushCreeperMod;
+import net.vercte.gleefulcreepers.GleefulCreepers;
 
 public class ItemModelGen extends ItemModelProvider {
     public ItemModelGen(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, LushCreeperMod.ID, existingFileHelper);
+        super(output, GleefulCreepers.ID, existingFileHelper);
     }
 
     @Override
     protected void registerModels() {
-        spawnEggItem(LushCreeperMod.LUSH_CREEPER_SPAWN_EGG.get());
+        spawnEggItem(GleefulCreepers.GLEEPER_SPAWN_EGG.get());
     }
 }

@@ -1,4 +1,4 @@
-package net.vercte.lushcreeper.creeper;
+package net.vercte.gleefulcreepers.creeper;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -34,15 +34,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.UUID;
 
-public class LushCreeper extends Monster implements NeutralMob {
-    private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> DATA_SEIZED = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.BOOLEAN);
+public class Gleeper extends Monster implements NeutralMob {
+    private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_SEIZED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
     private int oldSwell = 0;
     private int swell = 0;
     private int maxSwell = 30;
 
-    public LushCreeper(EntityType<? extends Monster> type, Level level) {
+    public Gleeper(EntityType<? extends Monster> type, Level level) {
         super(type, level);
     }
 

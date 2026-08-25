@@ -1,19 +1,17 @@
-package net.vercte.lushcreeper.creeper;
+package net.vercte.gleefulcreepers.creeper;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.monster.Creeper;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 
 public class SmileGoal extends Goal {
-    private final LushCreeper creeper;
+    private final Gleeper creeper;
     @Nullable
     private LivingEntity target;
 
-    public SmileGoal(LushCreeper creeper) {
+    public SmileGoal(Gleeper creeper) {
         this.creeper = creeper;
         this.setFlags(EnumSet.of(Flag.MOVE));
     }

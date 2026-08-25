@@ -1,4 +1,4 @@
-package net.vercte.lushcreeper;
+package net.vercte.gleefulcreepers;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -15,47 +15,47 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.vercte.lushcreeper.creeper.LushCreeper;
-import net.vercte.lushcreeper.util.datagen.LushCreeperModDatagen;
+import net.vercte.gleefulcreepers.creeper.Gleeper;
+import net.vercte.gleefulcreepers.util.datagen.GleefulDatagen;
 
 import java.util.function.Supplier;
 
-@Mod(LushCreeperMod.ID)
-public class LushCreeperMod {
-    public static final String ID = "lush_creeper";
+@Mod(GleefulCreepers.ID)
+public class GleefulCreepers {
+    public static final String ID = "gleeful_creepers";
 
-    public LushCreeperMod(IEventBus bus) {
+    public GleefulCreepers(IEventBus bus) {
         ENTITY_TYPES.register(bus);
         ITEMS.register(bus);
 
         bus.addListener(this::registerEntityAttributes);
         bus.addListener(this::buildCreativeTabs);
 
-        bus.addListener(LushCreeperModDatagen::gatherData);
+        bus.addListener(GleefulDatagen::gatherData);
     }
 
     private void registerEntityAttributes(EntityAttributeCreationEvent entityAttributeCreationEvent) {
-        entityAttributeCreationEvent.put(LUSH_CREEPER.get(), LushCreeper.createAttributes().build());
+        entityAttributeCreationEvent.put(GLEEPER.get(), Gleeper.createAttributes().build());
     }
 
     private void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if(event.getTabKey() != CreativeModeTabs.SPAWN_EGGS) return;
-        event.insertAfter(Items.CREEPER_SPAWN_EGG.getDefaultInstance(), LUSH_CREEPER_SPAWN_EGG.toStack(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        event.insertAfter(Items.CREEPER_SPAWN_EGG.getDefaultInstance(), GLEEPER_SPAWN_EGG.toStack(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
     }
 
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, ID);
 
-    public static final Supplier<EntityType<LushCreeper>> LUSH_CREEPER = ENTITY_TYPES.register(
-            "lush_creeper",
-            () -> EntityType.Builder.of(LushCreeper::new, MobCategory.MONSTER).sized(0.6f, 1.5f).clientTrackingRange(8).eyeHeight(1.25f)
-                    .build("lush_creeper:lush_creeper")
+    public static final Supplier<EntityType<Gleeper>> GLEEPER = ENTITY_TYPES.register(
+            "gleeper",
+            () -> EntityType.Builder.of(Gleeper::new, MobCategory.MONSTER).sized(0.6f, 1.5f).clientTrackingRange(8).eyeHeight(1.25f)
+                    .build("gleeful_creepers:gleeper")
     );
 
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ID);
 
-    public static final DeferredItem<DeferredSpawnEggItem> LUSH_CREEPER_SPAWN_EGG = ITEMS.register(
-            "lush_creeper_spawn_egg",
-            () -> new DeferredSpawnEggItem(LUSH_CREEPER, 0x70922d, 0xfd87cf, new Item.Properties())
+    public static final DeferredItem<DeferredSpawnEggItem> GLEEPER_SPAWN_EGG = ITEMS.register(
+            "gleeper_spawn_egg",
+            () -> new DeferredSpawnEggItem(GLEEPER, 0x70922d, 0xfd87cf, new Item.Properties())
     );
 
     public static ResourceLocation at(String path) {

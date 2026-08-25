@@ -1,4 +1,4 @@
-package net.vercte.lushcreeper.creeper;
+package net.vercte.gleefulcreepers.creeper;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -8,13 +8,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 
 public class SiezeGoal<T extends LivingEntity> extends Goal {
-    protected final LushCreeper creeper;
+    protected final Gleeper creeper;
     protected final Class<T> avoidClass;
     @Nullable protected T toAvoid;
     protected final float maxDist;
     private final TargetingConditions avoidEntityTargeting;
 
-    public SiezeGoal(LushCreeper mob, Class<T> avoidClass, float maxDist) {
+    public SiezeGoal(Gleeper mob, Class<T> avoidClass, float maxDist) {
         this.creeper = mob;
         this.avoidClass = avoidClass;
         this.maxDist = maxDist;

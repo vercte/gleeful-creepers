@@ -1,4 +1,4 @@
-package net.vercte.lushcreeper.creeper;
+package net.vercte.gleefulcreepers.creeper;
 
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -7,7 +7,7 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
-public class LushCreeperModel extends HierarchicalModel<LushCreeper> {
+public class GleeperModel extends HierarchicalModel<Gleeper> {
 	private final ModelPart root;
 	private final ModelPart head;
 	private final ModelPart body;
@@ -16,7 +16,7 @@ public class LushCreeperModel extends HierarchicalModel<LushCreeper> {
 	private final ModelPart leftFrontLeg;
 	private final ModelPart rightFrontLeg;
 
-	public LushCreeperModel(ModelPart root) {
+	public GleeperModel(ModelPart root) {
         this.root = root;
 		this.head = root.getChild("head");
 		this.body = root.getChild("body");
@@ -62,7 +62,7 @@ public class LushCreeperModel extends HierarchicalModel<LushCreeper> {
 	}
 
 	@Override
-	public void setupAnim(@NotNull LushCreeper entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(@NotNull Gleeper entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
 		this.head.xRot = headPitch * (float) (Math.PI / 180.0);
 		this.rightHindLeg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;

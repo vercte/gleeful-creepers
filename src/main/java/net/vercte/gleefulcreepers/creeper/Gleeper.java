@@ -1,9 +1,12 @@
 package net.vercte.gleefulcreepers.creeper;
 
+import com.mojang.logging.LogUtils;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
@@ -27,14 +30,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.EntityPositionSource;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gameevent.GameEventListener;
+import net.minecraft.world.level.gameevent.PositionSource;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.UUID;
 
-public class Gleeper extends Monster implements NeutralMob {
+public class Gleeper extends Monster implements NeutralMob, GameEventListener.Provider<Gleeper.Listener> {
     private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SEIZED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
@@ -42,10 +49,11 @@ public class Gleeper extends Monster implements NeutralMob {
     private int swell = 0;
     private int maxSwell = 30;
 
+    private final Listener listener = new Listener();
+
     public Gleeper(EntityType<? extends Monster> type, Level level) {
         super(type, level);
     }
-
 
     public void tick() {
         if (this.isAlive()) {
@@ -201,6 +209,12 @@ public class Gleeper extends Monster implements NeutralMob {
     }
 
     @Override
+    @NotNull
+    public Listener getListener() {
+        return listener;
+    }
+
+    @Override
     public int getRemainingPersistentAngerTime() {
         return 0;
     }
@@ -223,5 +237,28 @@ public class Gleeper extends Monster implements NeutralMob {
     @Override
     public void startPersistentAngerTimer() {
 
+    }
+
+    public class Listener implements GameEventListener {
+        private final EntityPositionSource positionSource = new EntityPositionSource(Gleeper.this, Gleeper.this.getEyeHeight());;
+
+        @Override
+        @NotNull
+        public PositionSource getListenerSource() {
+            return positionSource;
+        }
+
+        @Override
+        public int getListenerRadius() {
+            return 32;
+        }
+
+        @Override
+        public boolean handleGameEvent(@NotNull ServerLevel serverLevel, @NotNull Holder<GameEvent> event, @NotNull GameEvent.Context context, @NotNull Vec3 pos) {
+            if(!event.is(GameEvent.ENTITY_DAMAGE.key()) || !event.is(GameEvent.ENTITY_DIE.key())) return false;
+
+            LogUtils.getLogger().info("entity hurt: {}", context.sourceEntity());
+            return true;
+        }
     }
 }

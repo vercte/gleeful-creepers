@@ -43,11 +43,13 @@ public class SiezeGoal<T extends LivingEntity> extends Goal {
     @Override
     public void start() {
         this.creeper.getNavigation().stop();
+        this.creeper.setSiezed(true);
     }
 
     @Override
     public void stop() {
         this.toAvoid = null;
+        this.creeper.setSiezed(false);
     }
 
     @Override
@@ -62,7 +64,6 @@ public class SiezeGoal<T extends LivingEntity> extends Goal {
 
     @Override
     public void tick() {
-        this.creeper.getNavigation().stop();
         if(this.toAvoid != null && this.toAvoid.isAlive()) {
             this.creeper.getLookControl().setLookAt(this.toAvoid.getX(), this.toAvoid.getEyeY(), this.toAvoid.getZ());
         }

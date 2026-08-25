@@ -43,9 +43,14 @@ public class LushCreeperRenderer extends MobRenderer<LushCreeper, LushCreeperMod
     }
 
     @Override
+    protected boolean isShaking(@NotNull LushCreeper creeper) {
+        return super.isShaking(creeper) || creeper.isSiezed();
+    }
+
+    @Override
     @NotNull
     public ResourceLocation getTextureLocation(@NotNull LushCreeper lushCreeper) {
-        if(lushCreeper.hurtTime > 0) return NEUTRAL_TEXTURE;
+        if(lushCreeper.hurtTime > 0 || lushCreeper.isSiezed()) return NEUTRAL_TEXTURE;
         return HAPPY_TEXTURE;
     }
 }

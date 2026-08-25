@@ -37,6 +37,7 @@ import java.util.UUID;
 public class LushCreeper extends Monster implements NeutralMob {
     private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_SEIZED = SynchedEntityData.defineId(LushCreeper.class, EntityDataSerializers.BOOLEAN);
     private int oldSwell = 0;
     private int swell = 0;
     private int maxSwell = 30;
@@ -125,7 +126,6 @@ public class LushCreeper extends Monster implements NeutralMob {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
-        // TODO: make the gleeper shake
         this.goalSelector.addGoal(2, new SiezeGoal<>(this, Ocelot.class, 6));
         this.goalSelector.addGoal(2, new SiezeGoal<>(this, Cat.class, 6));
         this.goalSelector.addGoal(3, new SmileGoal(this));
@@ -153,10 +153,19 @@ public class LushCreeper extends Monster implements NeutralMob {
         return this.entityData.get(DATA_SWELL_DIR);
     }
 
+    public void setSiezed(boolean seized) {
+        this.entityData.set(DATA_SEIZED, seized);
+    }
+
+    public boolean isSiezed() {
+        return this.entityData.get(DATA_SEIZED);
+    }
+
     protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_SWELL_DIR, 0);
         builder.define(DATA_IS_IGNITED, false);
+        builder.define(DATA_SEIZED, false);
     }
 
     public float getSwelling(float pt) {

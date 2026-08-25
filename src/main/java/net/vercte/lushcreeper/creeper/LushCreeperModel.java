@@ -1,16 +1,12 @@
 package net.vercte.lushcreeper.creeper;
 
 import net.minecraft.client.model.HierarchicalModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.vercte.lushcreeper.LushCreeperMod;
 import org.jetbrains.annotations.NotNull;
 
 public class LushCreeperModel extends HierarchicalModel<LushCreeper> {
-	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(LushCreeperMod.at("lush_creeper"), "main");
 	private final ModelPart root;
 	private final ModelPart head;
 	private final ModelPart body;

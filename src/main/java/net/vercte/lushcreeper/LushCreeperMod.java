@@ -28,11 +28,10 @@ public class LushCreeperMod {
 
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, ID);
 
-    @SuppressWarnings("DataFlowIssue")
     public static final Supplier<EntityType<LushCreeper>> LUSH_CREEPER = ENTITY_TYPES.register(
             "lush_creeper",
             () -> EntityType.Builder.of(LushCreeper::new, MobCategory.MONSTER).sized(0.6f, 1.4f).clientTrackingRange(8)
-                    .build(null)
+                    .build("lush_creeper:lush_creeper")
     );
 
     public static ResourceLocation at(String path) {

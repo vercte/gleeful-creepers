@@ -2,9 +2,7 @@ package net.vercte.gleefulcreepers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.MobSpawnType;
@@ -13,7 +11,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
@@ -63,14 +60,12 @@ public class GleefulCreepers {
         BlockPos pos = event.getEntity().blockPosition();
         ServerLevelAccessor level = event.getLevel();
 
-        if(!level.getBiome(pos).is(GLEEPER_SPAWNS_IN)) return;
+        if(!level.getBiome(pos).is(GleefulTags.GLEEPER_SPAWNS_IN)) return;
 
         GLEEPER.get().spawn(level.getLevel(), pos, MobSpawnType.NATURAL);
 
         event.setSpawnCancelled(true);
     }
-
-    public static final TagKey<Biome> GLEEPER_SPAWNS_IN = TagKey.create(Registries.BIOME, at("gleeper_spawns_in"));
 
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, ID);
 

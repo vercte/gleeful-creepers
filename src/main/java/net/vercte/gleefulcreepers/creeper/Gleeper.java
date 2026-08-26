@@ -31,6 +31,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.Vec3;
+import net.vercte.gleefulcreepers.GleefulTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import util.access.LivingEntityAccessor;
@@ -213,7 +214,7 @@ public class Gleeper extends Monster {
         if(angerTarget == null || !(level() instanceof ServerLevel serverLevel)) return null;
 
         Entity angeredAt = serverLevel.getEntity(angerTarget);
-        if(!(angeredAt instanceof LivingEntity living) || !living.isAlive()) {
+        if(!(angeredAt instanceof LivingEntity living) || !shouldTarget(living)) {
             this.angerTarget = null;
             this.setAngered(false);
             return null;
@@ -228,6 +229,10 @@ public class Gleeper extends Monster {
         if(angerTarget == null) return super.getTarget();
         LivingEntity angerTargetEntity = getAngerTargetEntity();
         return angerTargetEntity == null ? super.getTarget() : angerTargetEntity;
+    }
+
+    public boolean shouldTarget(LivingEntity entity) {
+        return !entity.getType().is(GleefulTags.GLEEPER_FORGIVES) && entity.isAlive() && this.canAttack(entity);
     }
 
     @NotNull
@@ -283,6 +288,7 @@ public class Gleeper extends Monster {
 
             LivingEntity offender = ((LivingEntityAccessor)victim).gleeful_creepers$getAttacker();
             if(offender == null) return false;
+            if(!Gleeper.this.shouldTarget(offender)) return false;
             if(Gleeper.this.getAngerTarget() != null) return false;
 
             Sensing sensing = Gleeper.this.getSensing();

@@ -8,6 +8,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.vercte.gleefulcreepers.GleefulCreepers;
+import net.vercte.gleefulcreepers.GleefulTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +21,6 @@ public class BiomeTagGen extends TagsProvider<Biome> {
 
     @Override
     protected void addTags(@NotNull HolderLookup.Provider provider) {
-        tag(GleefulCreepers.GLEEPER_SPAWNS_IN).add(Biomes.LUSH_CAVES);
+        tag(GleefulTags.GLEEPER_SPAWNS_IN).add(Biomes.LUSH_CAVES);
     }
 }

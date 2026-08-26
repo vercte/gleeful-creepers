@@ -52,7 +52,7 @@ public class GleeperRenderer extends MobRenderer<Gleeper, GleeperModel> {
     public ResourceLocation getTextureLocation(@NotNull Gleeper lushCreeper) {
         if(lushCreeper.isSiezed()) return NEUTRAL_TEXTURE;
         if(lushCreeper.isAngered()) return ANGERED_TEXTURE;
-        if(lushCreeper.hurtTime > 0) return NEUTRAL_TEXTURE;
+        if(lushCreeper.hurtTime > 0 || lushCreeper.isSheared()) return NEUTRAL_TEXTURE;
         return HAPPY_TEXTURE;
     }
 }

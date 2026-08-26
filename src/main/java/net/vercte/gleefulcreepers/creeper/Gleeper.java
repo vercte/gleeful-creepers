@@ -1,5 +1,6 @@
 package net.vercte.gleefulcreepers.creeper;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -31,16 +32,18 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.IShearable;
 import net.vercte.gleefulcreepers.GleefulTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import util.access.LivingEntityAccessor;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-public class Gleeper extends Monster {
+public class Gleeper extends Monster implements IShearable {
     private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SEIZED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
@@ -183,6 +186,10 @@ public class Gleeper extends Monster {
         return this.entityData.get(DATA_ANGERED);
     }
 
+    public boolean isSheared() {
+        return this.entityData.get(DATA_SHEARED);
+    }
+
     protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_SWELL_DIR, 0);
@@ -250,6 +257,7 @@ public class Gleeper extends Monster {
 
         tag.putShort("Fuse", (short)this.maxSwell);
         tag.putBoolean("Ignited", this.isIgnited());
+        tag.putBoolean("Sheared", this.entityData.get(DATA_SHEARED));
         if(this.getAngerTarget() != null) tag.putUUID("AngerTarget", this.getAngerTarget());
     }
 
@@ -258,12 +266,25 @@ public class Gleeper extends Monster {
 
         if(tag.contains("Fuse", Tag.TAG_ANY_NUMERIC)) this.maxSwell = tag.getShort("Fuse");
         if(tag.getBoolean("Ignited")) this.ignite();
+        this.entityData.set(DATA_SHEARED, tag.getBoolean("Sheared"));
         if(tag.contains("AngerTarget", Tag.TAG_INT_ARRAY)) this.angerTarget = tag.getUUID("AngerTarget");
     }
 
     @Override
     public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> consumer) {
         if(this.level() instanceof ServerLevel level) consumer.accept(dynamicListener, level);
+    }
+
+    @Override
+    public boolean isShearable(@Nullable Player player, @NotNull ItemStack item, @NotNull Level level, @NotNull BlockPos pos) {
+        return !this.entityData.get(DATA_SHEARED);
+    }
+
+    @Override
+    @NotNull
+    public List<ItemStack> onSheared(@Nullable Player player, @NotNull ItemStack item, @NotNull Level level, @NotNull BlockPos pos) {
+        this.entityData.set(DATA_SHEARED, true);
+        return List.of(Items.SPORE_BLOSSOM.getDefaultInstance());
     }
 
     public class Listener implements GameEventListener {

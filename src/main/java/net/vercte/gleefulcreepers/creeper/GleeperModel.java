@@ -15,6 +15,8 @@ public class GleeperModel extends HierarchicalModel<Gleeper> {
 	private final ModelPart rightHindLeg;
 	private final ModelPart leftFrontLeg;
 	private final ModelPart rightFrontLeg;
+	private final ModelPart blossomStem;
+	private final ModelPart blossom;
 
 	public GleeperModel(ModelPart root) {
         this.root = root;
@@ -24,6 +26,8 @@ public class GleeperModel extends HierarchicalModel<Gleeper> {
 		this.rightHindLeg = root.getChild("right_hind_leg");
 		this.leftFrontLeg = root.getChild("left_front_leg");
 		this.rightFrontLeg = root.getChild("right_front_leg");
+		this.blossomStem = this.head.getChild("blossom_stem");
+		this.blossom = this.head.getChild("blossom");
 	}
 
     @Override
@@ -69,5 +73,8 @@ public class GleeperModel extends HierarchicalModel<Gleeper> {
 		this.leftHindLeg.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
 		this.rightFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
 		this.leftFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+
+		this.blossomStem.visible = !entity.isSheared();
+		this.blossom.visible = !entity.isSheared();
 	}
 }

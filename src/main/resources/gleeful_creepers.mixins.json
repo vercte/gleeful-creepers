@@ -4,6 +4,8 @@
   "package": "net.vercte.gleefulcreepers.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "LivingEntityMixin",
+    "PlayerMixin"
   ],
   "client": [
   ],

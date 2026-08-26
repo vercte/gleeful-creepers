@@ -1,6 +1,5 @@
 package net.vercte.gleefulcreepers.creeper;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -11,18 +10,19 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.AreaEffectCloud;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.sensing.Sensing;
 import net.minecraft.world.entity.animal.Cat;
 import net.minecraft.world.entity.animal.Ocelot;
 import net.minecraft.world.entity.monster.Monster;
@@ -30,26 +30,32 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gameevent.EntityPositionSource;
-import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.gameevent.GameEventListener;
-import net.minecraft.world.level.gameevent.PositionSource;
+import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
-public class Gleeper extends Monster implements NeutralMob, GameEventListener.Provider<Gleeper.Listener> {
+public class Gleeper extends Monster implements NeutralMob {
+    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
+
     private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SEIZED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_ANGERED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
+
     private int oldSwell = 0;
     private int swell = 0;
     private int maxSwell = 30;
 
+    private int angerTime;
+    @Nullable private UUID angerTarget;
+
     private final Listener listener = new Listener();
+    private final DynamicGameEventListener<Listener> dynamicListener = new DynamicGameEventListener<>(listener);
 
     public Gleeper(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -81,6 +87,18 @@ public class Gleeper extends Monster implements NeutralMob, GameEventListener.Pr
         }
 
         super.tick();
+    }
+
+    @Override
+    public void aiStep() {
+        if (!this.level().isClientSide) {
+            this.setRemainingPersistentAngerTime(this.getRemainingPersistentAngerTime() - 1);
+            if(this.getRemainingPersistentAngerTime() <= 0) {
+                this.stopBeingAngry();
+            }
+        }
+
+        super.aiStep();
     }
 
     private void explodeCreeper() {
@@ -169,11 +187,20 @@ public class Gleeper extends Monster implements NeutralMob, GameEventListener.Pr
         return this.entityData.get(DATA_SEIZED);
     }
 
+    public void setAngered(boolean angered) {
+        this.entityData.set(DATA_ANGERED, angered);
+    }
+
+    public boolean isAngered() {
+        return this.entityData.get(DATA_ANGERED);
+    }
+
     protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_SWELL_DIR, 0);
         builder.define(DATA_IS_IGNITED, false);
         builder.define(DATA_SEIZED, false);
+        builder.define(DATA_ANGERED, false);
     }
 
     public float getSwelling(float pt) {
@@ -199,6 +226,7 @@ public class Gleeper extends Monster implements NeutralMob, GameEventListener.Pr
 
         tag.putShort("Fuse", (short)this.maxSwell);
         tag.putBoolean("Ignited", this.isIgnited());
+        this.addPersistentAngerSaveData(tag);
     }
 
     public void readAdditionalSaveData(@NotNull CompoundTag tag) {
@@ -206,37 +234,39 @@ public class Gleeper extends Monster implements NeutralMob, GameEventListener.Pr
 
         if(tag.contains("Fuse", 99)) this.maxSwell = tag.getShort("Fuse");
         if(tag.getBoolean("Ignited")) this.ignite();
+        this.readPersistentAngerSaveData(this.level(), tag);
     }
 
     @Override
-    @NotNull
-    public Listener getListener() {
-        return listener;
+    public void updateDynamicGameEventListener(@NotNull BiConsumer<DynamicGameEventListener<?>, ServerLevel> consumer) {
+        if(this.level() instanceof ServerLevel level) consumer.accept(dynamicListener, level);
     }
 
     @Override
     public int getRemainingPersistentAngerTime() {
-        return 0;
+        return angerTime;
     }
 
     @Override
-    public void setRemainingPersistentAngerTime(int i) {
-
+    public void setRemainingPersistentAngerTime(int time) {
+        this.angerTime = time;
     }
 
     @Override
-    public @Nullable UUID getPersistentAngerTarget() {
-        return null;
+    @Nullable
+    public UUID getPersistentAngerTarget() {
+        return this.angerTarget;
     }
 
     @Override
     public void setPersistentAngerTarget(@Nullable UUID uuid) {
-
+        this.setAngered(uuid != null);
+        this.angerTarget = uuid;
     }
 
     @Override
     public void startPersistentAngerTimer() {
-
+        this.setRemainingPersistentAngerTime(PERSISTENT_ANGER_TIME.sample(this.random));
     }
 
     public class Listener implements GameEventListener {
@@ -250,14 +280,25 @@ public class Gleeper extends Monster implements NeutralMob, GameEventListener.Pr
 
         @Override
         public int getListenerRadius() {
-            return 32;
+            return GameEvent.ENTITY_DAMAGE.value().notificationRadius();
         }
 
         @Override
         public boolean handleGameEvent(@NotNull ServerLevel serverLevel, @NotNull Holder<GameEvent> event, @NotNull GameEvent.Context context, @NotNull Vec3 pos) {
-            if(!event.is(GameEvent.ENTITY_DAMAGE.key()) || !event.is(GameEvent.ENTITY_DIE.key())) return false;
+            if(!event.is(GameEvent.ENTITY_DAMAGE.key()) && !event.is(GameEvent.ENTITY_DIE.key())) return false;
 
-            LogUtils.getLogger().info("entity hurt: {}", context.sourceEntity());
+            if(!(context.sourceEntity() instanceof LivingEntity victim)) return false;
+
+            LivingEntity offender = victim.getLastHurtByMob();
+            if(offender == null) return false;
+            if(Gleeper.this.getPersistentAngerTarget() != null) return false;
+
+            Sensing sensing = Gleeper.this.getSensing();
+            if(!sensing.hasLineOfSight(victim) && !sensing.hasLineOfSight(offender)) return false;
+
+            Gleeper.this.setPersistentAngerTarget(offender.getUUID());
+            Gleeper.this.startPersistentAngerTimer();
+
             return true;
         }
     }

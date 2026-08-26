@@ -14,7 +14,7 @@ public class GleeperRenderer extends MobRenderer<Gleeper, GleeperModel> {
 
     private static final ResourceLocation HAPPY_TEXTURE = GleefulCreepers.at("textures/entity/gleeper/happy.png");
     private static final ResourceLocation NEUTRAL_TEXTURE = GleefulCreepers.at("textures/entity/gleeper/neutral.png");
-    private static final ResourceLocation UNHAPPY_TEXTURE = GleefulCreepers.at("textures/entity/gleeper/unhappy.png");
+    private static final ResourceLocation ANGERED_TEXTURE = GleefulCreepers.at("textures/entity/gleeper/angered.png");
 
     public GleeperRenderer(EntityRendererProvider.Context context, GleeperModel model) {
         super(context, model, 0.5f);
@@ -50,7 +50,9 @@ public class GleeperRenderer extends MobRenderer<Gleeper, GleeperModel> {
     @Override
     @NotNull
     public ResourceLocation getTextureLocation(@NotNull Gleeper lushCreeper) {
-        if(lushCreeper.hurtTime > 0 || lushCreeper.isSiezed()) return NEUTRAL_TEXTURE;
+        if(lushCreeper.isSiezed()) return NEUTRAL_TEXTURE;
+        if(lushCreeper.isAngered()) return ANGERED_TEXTURE;
+        if(lushCreeper.hurtTime > 0) return NEUTRAL_TEXTURE;
         return HAPPY_TEXTURE;
     }
 }

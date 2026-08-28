@@ -1,4 +1,5 @@
 - [ ] Make the Gleeper plant things on explosion
+- [ ] Loot Table
 - [ ] Config
   - [ ] Explosion size, strength... make it less than normal creeper by default
   - [ ] Whether the explosion harms blocks (it should ngl)
@@ -6,3 +7,6 @@
 - [ ] Sounds
   - [ ] Hissing sounds, they aren't completely silent unlike normal creepers
   - [ ] Rattling sounds when targeting a mob angrily
+- [ ] Particles
+  - [ ] Moss particles on explosion (same one the spore flower makes)
+  - [x] Sweat particles when seized

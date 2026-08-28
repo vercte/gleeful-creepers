@@ -2,6 +2,8 @@ package net.vercte.gleefulcreepers.creeper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -10,8 +12,11 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.ParticleUtils;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,7 +26,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.sensing.Sensing;
 import net.minecraft.world.entity.animal.Cat;
 import net.minecraft.world.entity.animal.Ocelot;
@@ -65,6 +69,12 @@ public class Gleeper extends Monster implements IShearable {
 
     public void tick() {
         if (this.isAlive()) {
+            if(level().isClientSide() && this.isSiezed() && level().getGameTime() % 6 == 0) {
+                double x = this.random.nextGaussian() * 0.02;
+                double z = this.random.nextGaussian() * 0.02;
+                this.level().addParticle(ParticleTypes.SPLASH, this.getRandomX(0.5), this.getY() + 1.7, this.getRandomZ(0.5), x, 0, z);
+            }
+
             this.oldSwell = this.swell;
 
             boolean ignited = this.isIgnited();
@@ -121,21 +131,49 @@ public class Gleeper extends Monster implements IShearable {
 
     @NotNull
     protected InteractionResult mobInteract(Player player, @NotNull InteractionHand hand) {
-        ItemStack itemstack = player.getItemInHand(hand);
-        if (itemstack.is(ItemTags.CREEPER_IGNITERS)) {
-            SoundEvent soundevent = itemstack.is(Items.FIRE_CHARGE) ? SoundEvents.FIRECHARGE_USE : SoundEvents.FLINTANDSTEEL_USE;
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.is(ItemTags.CREEPER_IGNITERS)) {
+            SoundEvent soundevent = stack.is(Items.FIRE_CHARGE) ? SoundEvents.FIRECHARGE_USE : SoundEvents.FLINTANDSTEEL_USE;
             this.level().playSound(player, this.getX(), this.getY(), this.getZ(), soundevent, this.getSoundSource(), 1.0F, this.random.nextFloat() * 0.4F + 0.8F);
             if (!this.level().isClientSide) {
                 this.ignite();
-                if (!itemstack.isDamageableItem()) {
-                    itemstack.shrink(1);
+                if (!stack.isDamageableItem()) {
+                    stack.shrink(1);
                 } else {
-                    itemstack.hurtAndBreak(1, player, getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, getSlotForHand(hand));
                 }
             }
 
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
+
+        if(stack.is(GleefulTags.ACTS_AS_BONE_MEAL) && isSheared()) {
+            this.level().playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.BONE_MEAL_USE, this.getSoundSource(), 1.0F, 1.0F);
+
+            if(this.level().isClientSide) {
+                for(int i = 0; i < 5; ++i) {
+                    double xv = getRandom().nextGaussian() * 0.02;
+                    double yv = getRandom().nextGaussian() * 0.02;
+                    double zv = getRandom().nextGaussian() * 0.02;
+                    double x = getX() - 0.5 + getRandom().nextDouble();
+                    double y = getY() + 1 + getRandom().nextDouble() * 0.5;
+                    double z = getZ() - 0.5 + getRandom().nextDouble();
+                    level().addParticle(ParticleTypes.HAPPY_VILLAGER, x, y, z, xv, yv, zv);
+                }
+            }
+
+            if(!this.level().isClientSide) {
+                if(getRandom().nextInt(3) == 0) setSheared(false);
+                if (!stack.isDamageableItem()) {
+                    stack.shrink(1);
+                } else {
+                    stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                }
+            }
+
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
+
         return super.mobInteract(player, hand);
     }
 
@@ -150,7 +188,7 @@ public class Gleeper extends Monster implements IShearable {
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(1, new GleeperTargetPlayersGoal(this));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
     }
 
@@ -184,6 +222,10 @@ public class Gleeper extends Monster implements IShearable {
 
     public boolean isAngered() {
         return this.entityData.get(DATA_ANGERED);
+    }
+
+    public void setSheared(boolean sheared) {
+        this.entityData.set(DATA_SHEARED, sheared);
     }
 
     public boolean isSheared() {
@@ -257,7 +299,7 @@ public class Gleeper extends Monster implements IShearable {
 
         tag.putShort("Fuse", (short)this.maxSwell);
         tag.putBoolean("Ignited", this.isIgnited());
-        tag.putBoolean("Sheared", this.entityData.get(DATA_SHEARED));
+        tag.putBoolean("Sheared", isSheared());
         if(this.getAngerTarget() != null) tag.putUUID("AngerTarget", this.getAngerTarget());
     }
 
@@ -266,7 +308,7 @@ public class Gleeper extends Monster implements IShearable {
 
         if(tag.contains("Fuse", Tag.TAG_ANY_NUMERIC)) this.maxSwell = tag.getShort("Fuse");
         if(tag.getBoolean("Ignited")) this.ignite();
-        this.entityData.set(DATA_SHEARED, tag.getBoolean("Sheared"));
+        setSheared(tag.getBoolean("Sheared"));
         if(tag.contains("AngerTarget", Tag.TAG_INT_ARRAY)) this.angerTarget = tag.getUUID("AngerTarget");
     }
 
@@ -277,13 +319,17 @@ public class Gleeper extends Monster implements IShearable {
 
     @Override
     public boolean isShearable(@Nullable Player player, @NotNull ItemStack item, @NotNull Level level, @NotNull BlockPos pos) {
-        return !this.entityData.get(DATA_SHEARED);
+        return !isSheared();
     }
 
     @Override
     @NotNull
     public List<ItemStack> onSheared(@Nullable Player player, @NotNull ItemStack item, @NotNull Level level, @NotNull BlockPos pos) {
-        this.entityData.set(DATA_SHEARED, true);
+        this.level().playSound(null, this, SoundEvents.SHEEP_SHEAR, player == null ? SoundSource.BLOCKS : SoundSource.PLAYERS, 1.0F, 1.0F);
+
+        setSheared(true);
+        this.setTarget(null);
+
         return List.of(Items.SPORE_BLOSSOM.getDefaultInstance());
     }
 
@@ -310,7 +356,7 @@ public class Gleeper extends Monster implements IShearable {
             LivingEntity offender = ((LivingEntityAccessor)victim).gleeful_creepers$getAttacker();
             if(offender == null) return false;
             if(!Gleeper.this.shouldTarget(offender)) return false;
-            if(Gleeper.this.getAngerTarget() != null) return false;
+            if(Gleeper.this.getAngerTarget() != null && victim != Gleeper.this) return false;
 
             Sensing sensing = Gleeper.this.getSensing();
             if(!sensing.hasLineOfSight(victim) && !sensing.hasLineOfSight(offender)) return false;

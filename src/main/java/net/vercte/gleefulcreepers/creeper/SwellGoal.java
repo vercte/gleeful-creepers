@@ -3,11 +3,14 @@ package net.vercte.gleefulcreepers.creeper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
+import java.util.EnumSet;
+
 public class SwellGoal extends Goal {
     private final Gleeper creeper;
 
     public SwellGoal(Gleeper creeper) {
         this.creeper = creeper;
+        this.setFlags(EnumSet.of(Flag.TARGET)); // this is just here so seizing up from cats stops the creeper from swelling
     }
 
     @Override

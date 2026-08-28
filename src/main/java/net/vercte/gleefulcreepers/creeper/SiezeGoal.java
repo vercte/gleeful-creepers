@@ -19,7 +19,7 @@ public class SiezeGoal<T extends LivingEntity> extends Goal {
         this.avoidClass = avoidClass;
         this.maxDist = maxDist;
         this.avoidEntityTargeting = TargetingConditions.forCombat().range(maxDist);
-        this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+        this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.TARGET)); // Flag.TARGET is just here so seizing up from cats stops the creeper from swelling
     }
 
     @Override

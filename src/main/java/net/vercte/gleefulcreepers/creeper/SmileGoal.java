@@ -33,8 +33,11 @@ public class SmileGoal extends Goal {
     }
 
     public boolean canUse() {
-        LivingEntity entity = this.creeper.getTarget();
-        return entity != null && entity != this.creeper.getAngerTargetEntity() && this.creeper.distanceToSqr(entity) < (double)9.0F;
+        LivingEntity entity = creeper.getTarget();
+        return !creeper.isSheared() &&
+               entity != null &&
+               entity != creeper.getAngerTargetEntity() &&
+               creeper.distanceToSqr(entity) < (double)9.0F;
     }
 
     @Override

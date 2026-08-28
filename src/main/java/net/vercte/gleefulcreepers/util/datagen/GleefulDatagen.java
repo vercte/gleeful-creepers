@@ -8,6 +8,7 @@ import net.vercte.gleefulcreepers.util.datagen.assets.ItemModelGen;
 import net.vercte.gleefulcreepers.util.datagen.assets.LangGen;
 import net.vercte.gleefulcreepers.util.datagen.data.BiomeTagGen;
 import net.vercte.gleefulcreepers.util.datagen.data.EntityTagGen;
+import net.vercte.gleefulcreepers.util.datagen.data.ItemTagGen;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -20,6 +21,7 @@ public class GleefulDatagen {
         event.addProvider(new ItemModelGen(output, fileHelper));
         event.addProvider(new LangGen(output));
 
+        event.addProvider(new ItemTagGen(output, registries));
         event.addProvider(new EntityTagGen(output, registries, fileHelper));
         event.addProvider(new BiomeTagGen(output, registries, fileHelper));
     }

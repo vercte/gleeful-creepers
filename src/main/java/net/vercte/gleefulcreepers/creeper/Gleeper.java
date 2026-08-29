@@ -2,7 +2,6 @@ package net.vercte.gleefulcreepers.creeper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -15,8 +14,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
-import net.minecraft.util.ParticleUtils;
-import net.minecraft.util.RandomSource;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -48,6 +47,8 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class Gleeper extends Monster implements IShearable {
+    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(30, 40);
+
     private static final EntityDataAccessor<Integer> DATA_SWELL_DIR = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_IS_IGNITED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_SEIZED = SynchedEntityData.defineId(Gleeper.class, EntityDataSerializers.BOOLEAN);
@@ -57,6 +58,9 @@ public class Gleeper extends Monster implements IShearable {
     private int oldSwell = 0;
     private int swell = 0;
     private int maxSwell = 30;
+
+    private int angerTimeMax = 0;
+    private int angerTime = 0;
 
     @Nullable private UUID angerTarget;
 
@@ -74,6 +78,8 @@ public class Gleeper extends Monster implements IShearable {
                 double z = this.random.nextGaussian() * 0.02;
                 this.level().addParticle(ParticleTypes.SPLASH, this.getRandomX(0.5), this.getY() + 1.7, this.getRandomZ(0.5), x, 0, z);
             }
+
+            updateAnger();
 
             this.oldSwell = this.swell;
 
@@ -99,6 +105,24 @@ public class Gleeper extends Monster implements IShearable {
         }
 
         super.tick();
+    }
+
+    private void updateAnger() {
+        LivingEntity angerTarget = getAngerTargetEntity();
+        if(angerTarget == null) return;
+
+        boolean invalid = isInvalidTarget(angerTarget);
+        if(!invalid && getSensing().hasLineOfSight(angerTarget) && angerTime > 0) {
+            angerTime = angerTimeMax;
+            return;
+        }
+
+        if(angerTime > 0) angerTime -= isSiezed() ? 3 : 1;
+        if(angerTime <= 0 || invalid) {
+            angerTime = 0;
+            setAngerTarget(null);
+            setAngered(false);
+        }
     }
 
     private void explodeCreeper() {
@@ -232,6 +256,11 @@ public class Gleeper extends Monster implements IShearable {
         return this.entityData.get(DATA_SHEARED);
     }
 
+    public void startAngerTime(int time) {
+        this.angerTimeMax = time;
+        this.angerTime = time;
+    }
+
     protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_SWELL_DIR, 0);
@@ -263,11 +292,7 @@ public class Gleeper extends Monster implements IShearable {
         if(angerTarget == null || !(level() instanceof ServerLevel serverLevel)) return null;
 
         Entity angeredAt = serverLevel.getEntity(angerTarget);
-        if(!(angeredAt instanceof LivingEntity living) || !shouldTarget(living)) {
-            this.angerTarget = null;
-            this.setAngered(false);
-            return null;
-        }
+        if(!(angeredAt instanceof LivingEntity living)) return null;
 
         return living;
     }
@@ -280,8 +305,8 @@ public class Gleeper extends Monster implements IShearable {
         return angerTargetEntity == null ? super.getTarget() : angerTargetEntity;
     }
 
-    public boolean shouldTarget(LivingEntity entity) {
-        return !entity.getType().is(GleefulTags.GLEEPER_FORGIVES) && entity.isAlive() && this.canAttack(entity);
+    public boolean isInvalidTarget(LivingEntity entity) {
+        return entity.getType().is(GleefulTags.GLEEPER_FORGIVES) || !entity.isAlive() || !this.canAttack(entity);
     }
 
     @NotNull
@@ -300,6 +325,8 @@ public class Gleeper extends Monster implements IShearable {
         tag.putShort("Fuse", (short)this.maxSwell);
         tag.putBoolean("Ignited", this.isIgnited());
         tag.putBoolean("Sheared", isSheared());
+        tag.putInt("AngerTime", angerTime);
+        tag.putInt("AngerTimeMax", angerTimeMax);
         if(this.getAngerTarget() != null) tag.putUUID("AngerTarget", this.getAngerTarget());
     }
 
@@ -309,7 +336,12 @@ public class Gleeper extends Monster implements IShearable {
         if(tag.contains("Fuse", Tag.TAG_ANY_NUMERIC)) this.maxSwell = tag.getShort("Fuse");
         if(tag.getBoolean("Ignited")) this.ignite();
         setSheared(tag.getBoolean("Sheared"));
-        if(tag.contains("AngerTarget", Tag.TAG_INT_ARRAY)) this.angerTarget = tag.getUUID("AngerTarget");
+        angerTime = tag.getInt("AngerTime");
+        angerTimeMax = tag.getInt("AngerTimeMax");
+        if(tag.contains("AngerTarget", Tag.TAG_INT_ARRAY)) {
+            this.angerTarget = tag.getUUID("AngerTarget");
+            setAngered(true);
+        }
     }
 
     @Override
@@ -355,7 +387,7 @@ public class Gleeper extends Monster implements IShearable {
 
             LivingEntity offender = ((LivingEntityAccessor)victim).gleeful_creepers$getAttacker();
             if(offender == null) return false;
-            if(!Gleeper.this.shouldTarget(offender)) return false;
+            if(Gleeper.this.isInvalidTarget(offender)) return false;
             if(Gleeper.this.getAngerTarget() != null && victim != Gleeper.this) return false;
 
             Sensing sensing = Gleeper.this.getSensing();
@@ -363,6 +395,7 @@ public class Gleeper extends Monster implements IShearable {
 
             Gleeper.this.setAngered(true);
             Gleeper.this.setAngerTarget(offender.getUUID());
+            Gleeper.this.startAngerTime(PERSISTENT_ANGER_TIME.sample(random));
 
             return true;
         }

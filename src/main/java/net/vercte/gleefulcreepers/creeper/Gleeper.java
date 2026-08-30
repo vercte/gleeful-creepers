@@ -33,9 +33,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.MossBlock;
 import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.IShearable;
+import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -128,7 +131,10 @@ public class Gleeper extends Monster implements IShearable {
     private void explodeCreeper() {
         if (!this.level().isClientSide) {
             this.dead = true;
-            this.level().explode(this, this.getX(), this.getY(), this.getZ(), 3, Level.ExplosionInteraction.MOB);
+            this.level().explode(this, this.getX(), this.getY(), this.getZ(), GleefulConfig.EXPLOSION_RADIUS.get(), GleefulConfig.getExplosionLevel());
+
+            if(GleefulConfig.EXPLOSION_CREATES_FLORA.get()) ((MossBlock)Blocks.MOSS_BLOCK).performBonemeal((ServerLevel)level(), getRandom(), blockPosition().below(), Blocks.MOSS_BLOCK.defaultBlockState());
+
             this.spawnLingeringCloud();
             this.triggerOnDeathMobEffects(RemovalReason.KILLED);
             this.discard();
@@ -366,7 +372,7 @@ public class Gleeper extends Monster implements IShearable {
     }
 
     public class Listener implements GameEventListener {
-        private final EntityPositionSource positionSource = new EntityPositionSource(Gleeper.this, Gleeper.this.getEyeHeight());;
+        private final EntityPositionSource positionSource = new EntityPositionSource(Gleeper.this, Gleeper.this.getEyeHeight());
 
         @Override
         @NotNull

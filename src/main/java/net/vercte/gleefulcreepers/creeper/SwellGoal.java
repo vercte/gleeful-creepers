@@ -2,6 +2,7 @@ package net.vercte.gleefulcreepers.creeper;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.vercte.gleefulcreepers.GleefulConfig;
 
 import java.util.EnumSet;
 
@@ -10,7 +11,10 @@ public class SwellGoal extends Goal {
 
     public SwellGoal(Gleeper creeper) {
         this.creeper = creeper;
-        this.setFlags(EnumSet.of(Flag.TARGET)); // this is just here so seizing up from cats stops the creeper from swelling
+
+        EnumSet<Flag> flags = EnumSet.of(Flag.TARGET); // this is just here so seizing up from cats stops the creeper from swelling
+        if(!GleefulConfig.WALKS_WHILE_SWELLING.get()) flags.add(Flag.MOVE);
+        this.setFlags(flags);
     }
 
     @Override
@@ -25,7 +29,9 @@ public class SwellGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        LivingEntity entity = this.creeper.getTarget();
-        return entity != null && entity == this.creeper.getAngerTargetEntity() && this.creeper.distanceToSqr(entity) < (double)16.0F;
+        LivingEntity target = this.creeper.getTarget();
+        return target != null && target == this.creeper.getAngerTargetEntity() &&
+                this.creeper.distanceToSqr(target) < (double)16.0F &&
+                this.creeper.getSensing().hasLineOfSight(target);
     }
 }

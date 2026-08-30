@@ -42,7 +42,7 @@ import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import util.access.LivingEntityAccessor;
+import net.vercte.gleefulcreepers.util.access.LivingEntityAccessor;
 
 import java.util.Collection;
 import java.util.List;

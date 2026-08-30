@@ -22,7 +22,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.vercte.gleefulcreepers.creeper.Gleeper;
+import net.vercte.gleefulcreepers.gleeper.Gleeper;
 import net.vercte.gleefulcreepers.util.datagen.GleefulDatagen;
 
 import java.util.function.Supplier;

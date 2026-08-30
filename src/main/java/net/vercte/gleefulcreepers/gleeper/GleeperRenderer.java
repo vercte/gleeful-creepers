@@ -1,4 +1,4 @@
-package net.vercte.gleefulcreepers.creeper;
+package net.vercte.gleefulcreepers.gleeper;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelLayerLocation;

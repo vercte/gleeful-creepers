@@ -1,7 +1,8 @@
-package net.vercte.gleefulcreepers.creeper;
+package net.vercte.gleefulcreepers.gleeper.goal;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.vercte.gleefulcreepers.gleeper.Gleeper;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;

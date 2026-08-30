@@ -1,4 +1,4 @@
-package net.vercte.gleefulcreepers.creeper;
+package net.vercte.gleefulcreepers.gleeper;
 
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;

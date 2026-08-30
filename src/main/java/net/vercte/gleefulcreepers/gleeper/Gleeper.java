@@ -1,4 +1,4 @@
-package net.vercte.gleefulcreepers.creeper;
+package net.vercte.gleefulcreepers.gleeper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -40,6 +40,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.IShearable;
 import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulTags;
+import net.vercte.gleefulcreepers.gleeper.goal.GleeperTargetPlayersGoal;
+import net.vercte.gleefulcreepers.gleeper.goal.MeleeChaseGoal;
+import net.vercte.gleefulcreepers.gleeper.goal.SiezeGoal;
+import net.vercte.gleefulcreepers.gleeper.goal.SmileGoal;
+import net.vercte.gleefulcreepers.gleeper.goal.SwellGoal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import net.vercte.gleefulcreepers.util.access.LivingEntityAccessor;

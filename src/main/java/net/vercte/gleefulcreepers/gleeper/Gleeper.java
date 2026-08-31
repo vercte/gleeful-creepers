@@ -137,6 +137,7 @@ public class Gleeper extends Monster implements IShearable {
         if (!this.level().isClientSide) {
             this.dead = true;
             this.level().explode(this, this.getX(), this.getY(), this.getZ(), GleefulConfig.EXPLOSION_RADIUS.get(), GleefulConfig.getExplosionLevel());
+            ((ServerLevel)level()).sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR, this.getX(), this.getY() + 1, this.getZ(), 48, 0, 0,0, 1);
 
             if(GleefulConfig.EXPLOSION_CREATES_FLORA.get()) ((MossBlock)Blocks.MOSS_BLOCK).performBonemeal((ServerLevel)level(), getRandom(), blockPosition().below(), Blocks.MOSS_BLOCK.defaultBlockState());
 

@@ -1,6 +1,3 @@
 - [ ] Sounds
   - [ ] Hissing sounds, they aren't completely silent unlike normal creepers
   - [ ] Rattling sounds when targeting a mob angrily
-- [ ] Particles
-  - [ ] Moss particles on explosion (same one the spore flower makes)
-  - [x] Sweat particles when seized

@@ -35,6 +35,8 @@ public class GleefulCreepers {
         ENTITY_TYPES.register(bus);
         ITEMS.register(bus);
 
+        GleefulSounds.loadAndRegister(bus);
+
         bus.addListener(this::registerEntityAttributes);
         bus.addListener(this::buildCreativeTabs);
 

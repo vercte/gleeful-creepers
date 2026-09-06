@@ -39,6 +39,7 @@ import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.IShearable;
 import net.vercte.gleefulcreepers.GleefulConfig;
+import net.vercte.gleefulcreepers.GleefulSounds;
 import net.vercte.gleefulcreepers.GleefulTags;
 import net.vercte.gleefulcreepers.gleeper.goal.GleeperTargetPlayersGoal;
 import net.vercte.gleefulcreepers.gleeper.goal.MeleeChaseGoal;
@@ -323,12 +324,12 @@ public class Gleeper extends Monster implements IShearable {
 
     @NotNull
     protected SoundEvent getHurtSound(@NotNull DamageSource source) {
-        return SoundEvents.CREEPER_HURT;
+        return GleefulSounds.GLEEPER_HURT.get();
     }
 
     @NotNull
     protected SoundEvent getDeathSound() {
-        return SoundEvents.CREEPER_DEATH;
+        return GleefulSounds.GLEEPER_DEATH.get();
     }
 
     public void addAdditionalSaveData(@NotNull CompoundTag tag) {
@@ -408,6 +409,7 @@ public class Gleeper extends Monster implements IShearable {
             Gleeper.this.setAngered(true);
             Gleeper.this.setAngerTarget(offender.getUUID());
             Gleeper.this.startAngerTime(PERSISTENT_ANGER_TIME.sample(random));
+            Gleeper.this.playSound(GleefulSounds.GLEEPER_ANGER.get(), 1, 0.9f + (random.nextFloat() * 0.2f));
 
             return true;
         }

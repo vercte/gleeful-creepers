@@ -1,4 +1,7 @@
 {
   "entity.gleeful_creepers.gleeper": "Gleeper",
-  "item.gleeful_creepers.gleeper_spawn_egg": "Gleeper Spawn Egg"
+  "item.gleeful_creepers.gleeper_spawn_egg": "Gleeper Spawn Egg",
+  "sound.gleeful_creepers.gleeper_anger": "Gleeper angers",
+  "sound.gleeful_creepers.gleeper_death": "Gleeper dies",
+  "sound.gleeful_creepers.gleeper_hurt": "Gleeper hurts"
 }

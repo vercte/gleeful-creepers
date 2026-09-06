@@ -1,0 +1,28 @@
+{
+  "entity.gleeper.anger": {
+    "sounds": [
+      "gleeful_creepers:mob/gleeper/anger"
+    ],
+    "subtitle": "sound.gleeful_creepers.gleeper_hurt"
+  },
+  "entity.gleeper.death": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.creeper.death",
+        "pitch": 1.3
+      }
+    ],
+    "subtitle": "sound.gleeful_creepers.gleeper_death"
+  },
+  "entity.gleeper.hurt": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "entity.creeper.hurt",
+        "pitch": 1.5
+      }
+    ],
+    "subtitle": "sound.gleeful_creepers.gleeper_hurt"
+  }
+}

@@ -29,7 +29,7 @@ public class GleefulConfig {
     public static final ModConfigSpec.BooleanValue WALKS_WHILE_SWELLING = BUILDER
             .comment("Whether the Gleeper should still be able to follow its target while swelling for an explosion. Normal creepers don't.")
             .worldRestart()
-            .define("walksWhileSwelling", false);
+            .define("walksWhileSwelling", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 }

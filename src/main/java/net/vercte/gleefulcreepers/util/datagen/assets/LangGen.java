@@ -1,7 +1,9 @@
 package net.vercte.gleefulcreepers.util.datagen.assets;
 
 import net.minecraft.data.PackOutput;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulCreepers;
 
 public class LangGen extends LanguageProvider {
@@ -20,5 +22,19 @@ public class LangGen extends LanguageProvider {
         add(SOUND_GLEEPER_ANGER, "Gleeper angers");
         add(SOUND_GLEEPER_HURT, "Gleeper hurts");
         add(SOUND_GLEEPER_DEATH, "Gleeper dies");
+
+        addConfig("gleeper", "Gleeper");
+        addConfig(GleefulConfig.EXPLOSION_RADIUS, "Explosion Radius");
+        addConfig(GleefulConfig.EXPLOSION_DAMAGES_BLOCKS, "Explosion Damages Blocks");
+        addConfig(GleefulConfig.EXPLOSION_CREATES_FLORA, "Explosion Creates Flora");
+        addConfig(GleefulConfig.WALKS_WHILE_SWELLING, "Walks While Swelling");
+    }
+
+    private void addConfig(ModConfigSpec.ConfigValue<?> value, String text) {
+        addConfig(value.getPath().getLast(), text);
+    }
+
+    private void addConfig(String path, String text) {
+        add(GleefulCreepers.ID + ".configuration." + path, text);
     }
 }

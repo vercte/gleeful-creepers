@@ -1,3 +1,0 @@
-- [ ] Sounds
-  - [ ] Hissing sounds, they aren't completely silent unlike normal creepers
-  - [ ] Rattling sounds when targeting a mob angrily

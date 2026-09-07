@@ -3,9 +3,10 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id 'net.neoforged.moddev' version '2.0.144'
+    id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
 
-version = mod_version
+version = "${mod_version}+${minecraft_version}-${mod_loader.toLowerCase(Locale.ENGLISH)}"
 group = mod_group_id
 
 repositories {
@@ -98,6 +99,23 @@ publishing {
         maven {
             url "file://${project.projectDir}/repo"
         }
+    }
+}
+
+publishMods {
+    changelog = rootProject.file("CHANGELOG-LATEST.md").text // thank you evanbones
+    type = STABLE
+    file = tasks.named("jar").flatMap { it.archiveFile }
+    version = "${project.version}"
+    displayName = "${mod_name} ${project.version} for ${mod_loader} ${minecraft_version}"
+    modLoaders.add(mod_loader.toLowerCase(Locale.ENGLISH))
+
+    //noinspection GroovyAssignabilityCheck // What the heck!
+    modrinth {
+        accessToken = providers.gradleProperty("MODRINTH_PUBLISH_TOKEN").orNull
+        projectId = "F2pk6al7"
+        environment = CLIENT_AND_SERVER
+        minecraftVersions.add("${minecraft_version}")
     }
 }
 

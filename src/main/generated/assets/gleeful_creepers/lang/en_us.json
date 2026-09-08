@@ -4,6 +4,7 @@
   "gleeful_creepers.configuration.explosionDamagesBlocks": "Explosion Damages Blocks",
   "gleeful_creepers.configuration.explosionRadius": "Explosion Radius",
   "gleeful_creepers.configuration.gleeper": "Gleeper",
+  "gleeful_creepers.configuration.replaceCreeperSpawns": "Replace Creeper Spawns",
   "gleeful_creepers.configuration.walksWhileSwelling": "Walks While Swelling",
   "item.gleeful_creepers.gleeper_spawn_egg": "Gleeper Spawn Egg",
   "sound.gleeful_creepers.gleeper_anger": "Gleeper angers",

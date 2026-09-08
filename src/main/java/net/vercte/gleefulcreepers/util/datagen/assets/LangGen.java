@@ -32,6 +32,7 @@ public class LangGen extends FabricLanguageProvider {
         addConfig(l, GleefulConfig.EXPLOSION_DAMAGES_BLOCKS, "Explosion Damages Blocks");
         addConfig(l, GleefulConfig.EXPLOSION_CREATES_FLORA, "Explosion Creates Flora");
         addConfig(l, GleefulConfig.WALKS_WHILE_SWELLING, "Walks While Swelling");
+        addConfig(l, GleefulConfig.REPLACE_CREEPER_SPAWNS, "Replace Creeper Spawns");
     }
 
     private void addConfig(TranslationBuilder builder, ModConfigSpec.ConfigValue<?> value, String text) {

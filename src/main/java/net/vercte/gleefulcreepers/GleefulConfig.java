@@ -27,9 +27,14 @@ public class GleefulConfig {
             .define("explosionCreatesFlora", true);
 
     public static final ModConfigSpec.BooleanValue WALKS_WHILE_SWELLING = BUILDER
-            .comment("Whether the Gleeper should still be able to follow its target while swelling for an explosion. Normal creepers don't.")
+            .comment("Whether the Gleeper should still be able to follow its target while swelling for an explosion. Normal Creepers don't.")
             .worldRestart()
             .define("walksWhileSwelling", true);
+
+    public static final ModConfigSpec.BooleanValue REPLACE_CREEPER_SPAWNS = BUILDER
+            .comment("Whether the Gleeper should replace the Creeper in biomes tagged #gleeful_creepers:gleeper_spawns_in.")
+            .worldRestart()
+            .define("replaceCreeperSpawns", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 }

@@ -12,7 +12,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -42,9 +41,9 @@ public class GleefulCreepers implements ModInitializer {
         Predicate<BiomeSelectionContext> lushCave = p -> p.getBiomeRegistryEntry().is(GleefulTags.GLEEPER_SPAWNS_IN);
         BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> creeper = (m, s) -> s.type.equals(EntityType.CREEPER);
 
-        MobSpawnSettings.SpawnerData gleeper = new MobSpawnSettings.SpawnerData(GLEEPER, 4, 4, 150);
+        MobSpawnSettings.SpawnerData gleeper = new MobSpawnSettings.SpawnerData(GLEEPER, 4, 4, 100);
 
-        SpawnPlacements.register(GLEEPER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
+        SpawnPlacements.register(GLEEPER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Gleeper::checkGleeperSpawnRules);
         BiomeModifications.create(at("replace_creepers_in_lush_caves"))
                 .add(ModificationPhase.REPLACEMENTS, lushCave, ctx -> {
                     ctx.getSpawnSettings().removeSpawns(creeper);

@@ -1,15 +1,15 @@
 package net.vercte.gleefulcreepers;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -17,6 +17,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.vercte.gleefulcreepers.gleeper.Gleeper;
@@ -35,6 +36,7 @@ public class GleefulCreepers {
         GleefulSounds.loadAndRegister(bus);
 
         bus.addListener(this::registerEntityAttributes);
+        bus.addListener(this::registerSpawnPlacements);
         bus.addListener(this::buildCreativeTabs);
 
         bus.addListener(GleefulDatagen::gatherData);
@@ -42,8 +44,18 @@ public class GleefulCreepers {
         container.registerConfig(ModConfig.Type.SERVER, GleefulConfig.SPEC);
     }
 
-    private void registerEntityAttributes(EntityAttributeCreationEvent entityAttributeCreationEvent) {
-        entityAttributeCreationEvent.put(GLEEPER.get(), Gleeper.createAttributes().build());
+    private void registerEntityAttributes(EntityAttributeCreationEvent event) {
+        event.put(GLEEPER.get(), Gleeper.createAttributes().build());
+    }
+
+    private void registerSpawnPlacements(RegisterSpawnPlacementsEvent event) {
+        event.register(
+                GLEEPER.get(),
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Gleeper::checkGleeperSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE
+        );
     }
 
     private void buildCreativeTabs(BuildCreativeModeTabContentsEvent event) {

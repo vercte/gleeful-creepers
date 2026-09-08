@@ -61,7 +61,7 @@ public class GleefulDatagen {
                             )
                     );
 
-                    MobSpawnSettings.SpawnerData gleeperSpawnerData = new MobSpawnSettings.SpawnerData(GleefulCreepers.GLEEPER.get(), 4, 4, 150);
+                    MobSpawnSettings.SpawnerData gleeperSpawnerData = new MobSpawnSettings.SpawnerData(GleefulCreepers.GLEEPER.get(), 4, 4, 100);
                     bootstrap.register(ADD_GLEEPERS_TO_LUSH_CAVES,
                             new BiomeModifiers.AddSpawnsBiomeModifier(
                                     biomes.getOrThrow(GleefulTags.GLEEPER_SPAWNS_IN),

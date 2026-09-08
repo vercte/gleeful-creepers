@@ -1,21 +1,20 @@
 package net.vercte.gleefulcreepers.util.datagen.assets;
 
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 import net.vercte.gleefulcreepers.GleefulCreepers;
 import net.vercte.gleefulcreepers.GleefulSounds;
 
 public class SoundGen extends SoundDefinitionsProvider {
-    public SoundGen(PackOutput output, ExistingFileHelper helper) {
-        super(output, GleefulCreepers.ID, helper);
+    public SoundGen(PackOutput output) {
+        super(output, GleefulCreepers.ID);
     }
 
     @Override
     public void registerSounds() {
         add(
-                GleefulSounds.GLEEPER_ANGER,
+                GleefulSounds.GLEEPER_ANGER.get(),
                 SoundDefinition.definition().with(
                                 sound(GleefulCreepers.at("mob/gleeper/anger"), SoundDefinition.SoundType.SOUND)
                         )
@@ -23,7 +22,7 @@ public class SoundGen extends SoundDefinitionsProvider {
         );
 
         add(
-                GleefulSounds.GLEEPER_HURT,
+                GleefulSounds.GLEEPER_HURT.get(),
                 SoundDefinition.definition().with(
                         sound("minecraft:entity.creeper.hurt", SoundDefinition.SoundType.EVENT)
                                 .pitch(1.5f)
@@ -32,7 +31,7 @@ public class SoundGen extends SoundDefinitionsProvider {
         );
 
         add(
-                GleefulSounds.GLEEPER_DEATH,
+                GleefulSounds.GLEEPER_DEATH.get(),
                 SoundDefinition.definition().with(
                                 sound("minecraft:entity.creeper.death", SoundDefinition.SoundType.EVENT)
                                         .pitch(1.3f)

@@ -1,13 +1,16 @@
 package net.vercte.gleefulcreepers.util.datagen.data;
 
-import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.criterion.EntityPredicate;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.EntityLootSubProvider;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -36,6 +39,8 @@ public class EntityLootTableGen extends EntityLootSubProvider {
 
     @Override
     public void generate() {
+        HolderGetter<EntityType<?>> entities = registries.lookup(Registries.ENTITY_TYPE).orElseThrow();
+
         add(
                 GleefulCreepers.GLEEPER.get(),
                 LootTable.lootTable()
@@ -61,7 +66,7 @@ public class EntityLootTableGen extends EntityLootSubProvider {
                                         .add(TagEntry.expandTag(ItemTags.CREEPER_DROP_MUSIC_DISCS))
                                         .when(
                                                 LootItemEntityPropertyCondition.hasProperties(
-                                                        LootContext.EntityTarget.ATTACKER, EntityPredicate.Builder.entity().of(EntityTypeTags.SKELETONS)
+                                                        LootContext.EntityTarget.ATTACKER, EntityPredicate.Builder.entity().of(entities, EntityTypeTags.SKELETONS)
                                                 )
                                         )
                         )

@@ -3,8 +3,8 @@
   "biomes": "#gleeful_creepers:gleeper_spawns_in",
   "spawners": {
     "type": "gleeful_creepers:gleeper",
-    "maxCount": 100,
+    "maxCount": 4,
     "minCount": 4,
-    "weight": 4
+    "weight": 100
   }
 }

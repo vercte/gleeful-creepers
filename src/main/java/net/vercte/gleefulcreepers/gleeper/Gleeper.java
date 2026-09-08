@@ -299,6 +299,7 @@ public class Gleeper extends Monster implements IShearable {
 
     public void setAngerTarget(final @Nullable EntityReference<LivingEntity> target) {
         this.angerTarget = target;
+        if(target != null) setAngered(true);
     }
 
     @Nullable
@@ -353,7 +354,9 @@ public class Gleeper extends Monster implements IShearable {
         this.setSheared(input.getBooleanOr("Sheared", false));
         this.angerTime = input.getIntOr("AngerTime", 0);
         this.angerTimeMax = input.getIntOr("AngerTimeMax", 0);
+
         this.setAngerTarget(EntityReference.read(input, "AngerTarget"));
+
         if (input.getBooleanOr("ignited", false)) {
             this.ignite();
         }

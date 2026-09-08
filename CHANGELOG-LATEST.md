@@ -1,1 +1,1 @@
-- initial release!
+- change spawn rates and conditions for the gleeper

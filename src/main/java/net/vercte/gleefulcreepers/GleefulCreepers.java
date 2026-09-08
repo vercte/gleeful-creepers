@@ -73,9 +73,9 @@ public class GleefulCreepers {
 
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ID);
 
-    public static final DeferredItem<SpawnEggItem> GLEEPER_SPAWN_EGG = ITEMS.register(
+    public static final DeferredItem<SpawnEggItem> GLEEPER_SPAWN_EGG = ITEMS.registerItem(
             "gleeper_spawn_egg",
-            () -> new SpawnEggItem(new Item.Properties().spawnEgg(GLEEPER.get()))
+            p -> new SpawnEggItem(p.spawnEgg(GLEEPER.get()))
     );
 
     public static Identifier at(String path) {

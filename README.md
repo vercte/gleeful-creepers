@@ -1,6 +1,8 @@
 # Gleeful Creepers
 [![Available on Modrinth](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg)](https://modrinth.com/mod/gleeful-creepers)
 [![Available for NeoForge](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/neoforge_vector.svg)](https://modrinth.com/mod/gleeful-creepers/versions?l=neoforge)
+[![Available for Fabric](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg)](https://modrinth.com/mod/gleeful-creepers/versions?l=fabric)
+
 
 Gleeful Creepers adds a new Creeper variant named the Gleeper.  
 The Gleeper is a joyful creature that inhabits the Lush Caves, aiming to keep violence to

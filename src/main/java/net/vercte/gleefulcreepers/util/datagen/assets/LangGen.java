@@ -1,16 +1,17 @@
 package net.vercte.gleefulcreepers.util.datagen.assets;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulCreepers;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
 public class LangGen extends FabricLanguageProvider {
-    public LangGen(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
+    public LangGen(FabricPackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(dataOutput, registryLookup);
     }
 
@@ -20,7 +21,7 @@ public class LangGen extends FabricLanguageProvider {
     static final String SOUND_GLEEPER_DEATH = "sound.gleeful_creepers.gleeper_death";
 
     @Override
-    public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder l) {
+    public void generateTranslations(@NotNull HolderLookup.Provider registryLookup, TranslationBuilder l) {
         l.add(GleefulCreepers.GLEEPER, "Gleeper");
         l.add(GleefulCreepers.GLEEPER_SPAWN_EGG, "Gleeper Spawn Egg");
         l.add(SOUND_GLEEPER_ANGER, "Gleeper angers");

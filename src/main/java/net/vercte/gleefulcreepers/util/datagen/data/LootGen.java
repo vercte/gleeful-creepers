@@ -1,12 +1,15 @@
 package net.vercte.gleefulcreepers.util.datagen.data;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider;
-import net.minecraft.advancements.critereon.EntityPredicate;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableSubProvider;
+import net.minecraft.advancements.criterion.EntityPredicate;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -20,24 +23,27 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyC
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.vercte.gleefulcreepers.GleefulCreepers;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 
-public class LootGen extends SimpleFabricLootTableProvider {
+public class LootGen extends SimpleFabricLootTableSubProvider {
     private final CompletableFuture<HolderLookup.Provider> registryLookup;
 
-    public LootGen(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
+    public LootGen(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(output, registryLookup, LootContextParamSets.ENTITY);
         this.registryLookup = registryLookup;
     }
 
     @Override
-    public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer) {
+    public void generate(@NotNull BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer) {
         try {
+            HolderGetter<EntityType<?>> entities = registryLookup.get().lookup(Registries.ENTITY_TYPE).orElseThrow();;
+
             biConsumer.accept(
-                    GleefulCreepers.GLEEPER.getDefaultLootTable(),
+                    GleefulCreepers.GLEEPER.getDefaultLootTable().get(),
                     LootTable.lootTable()
                             .withPool(
                                     LootPool.lootPool()
@@ -61,7 +67,7 @@ public class LootGen extends SimpleFabricLootTableProvider {
                                             .add(TagEntry.expandTag(ItemTags.CREEPER_DROP_MUSIC_DISCS))
                                             .when(
                                                     LootItemEntityPropertyCondition.hasProperties(
-                                                            LootContext.EntityTarget.ATTACKER, EntityPredicate.Builder.entity().of(EntityTypeTags.SKELETONS)
+                                                            LootContext.EntityTarget.ATTACKER, EntityPredicate.Builder.entity().of(entities, EntityTypeTags.SKELETONS)
                                                     )
                                             )
                             )

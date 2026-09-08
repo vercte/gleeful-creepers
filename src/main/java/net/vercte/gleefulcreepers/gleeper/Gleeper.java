@@ -57,7 +57,6 @@ import org.jetbrains.annotations.Nullable;
 import net.vercte.gleefulcreepers.util.access.LivingEntityAccessor;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class Gleeper extends Monster implements Shearable {
@@ -218,10 +217,10 @@ public class Gleeper extends Monster implements Shearable {
         }
 
         if (stack.is(Items.SHEARS)) {
-            if (!this.level().isClientSide && this.readyForShearing()) {
-                this.shear(SoundSource.PLAYERS);
+            if (!this.level().isClientSide() && this.readyForShearing()) {
+                this.shear((ServerLevel)level(), SoundSource.PLAYERS, stack);
                 this.gameEvent(GameEvent.SHEAR, player);
-                stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 return InteractionResult.SUCCESS;
             } else {
                 return InteractionResult.CONSUME;
@@ -364,7 +363,10 @@ public class Gleeper extends Monster implements Shearable {
         this.setSheared(input.getBooleanOr("Sheared", false));
         this.angerTime = input.getIntOr("AngerTime", 0);
         this.angerTimeMax = input.getIntOr("AngerTimeMax", 0);
+
         this.setAngerTarget(EntityReference.read(input, "AngerTarget"));
+        if(angerTarget != null) setAngered(true);
+
         if (input.getBooleanOr("ignited", false)) {
             this.ignite();
         }
@@ -405,13 +407,13 @@ public class Gleeper extends Monster implements Shearable {
     }
 
     @Override
-    public void shear(SoundSource soundSource) {
+    public void shear(@NotNull ServerLevel level, @NotNull SoundSource soundSource, @NotNull ItemStack stack) {
         this.level().playSound(null, this, SoundEvents.SHEEP_SHEAR, soundSource, 1.0F, 1.0F);
 
         setSheared(true);
         this.setTarget(null);
 
-        ItemEntity item = this.spawnAtLocation(Items.SPORE_BLOSSOM, 1);
+        ItemEntity item = this.spawnAtLocation(level, Items.SPORE_BLOSSOM.getDefaultInstance(), 1);
         if (item != null) {
             item.setDeltaMovement(
                     item.getDeltaMovement()

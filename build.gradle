@@ -117,6 +117,14 @@ publishMods {
         environment = CLIENT_AND_SERVER
         minecraftVersions.add("${minecraft_version}")
     }
+
+    //noinspection GroovyAssignabilityCheck
+    github {
+        accessToken = providers.gradleProperty("GITHUB_PUBLISH_TOKEN").orNull
+        repository = "vercte/gleeful-creepers"
+        tagName = "21.1/neo/${project.version}"
+        commitish = "21.1/neo/dev"
+    }
 }
 
 idea {

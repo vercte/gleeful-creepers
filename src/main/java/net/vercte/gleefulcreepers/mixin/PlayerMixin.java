@@ -1,5 +1,6 @@
 package net.vercte.gleefulcreepers.mixin;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +27,7 @@ public class PlayerMixin implements LivingEntityAccessor {
     }
 
     @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;gameEvent(Lnet/minecraft/core/Holder;)V"))
-    public void addAttackerInfo(DamageSource source, float f, CallbackInfo ci) {
+    public void addAttackerInfo(ServerLevel level, DamageSource source, float dmg, CallbackInfo ci) {
         this.gleeful_creepers$attacker = source.getEntity() instanceof LivingEntity living ? living : null;
     }
 }

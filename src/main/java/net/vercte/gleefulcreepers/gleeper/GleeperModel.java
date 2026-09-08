@@ -1,14 +1,12 @@
 package net.vercte.gleefulcreepers.gleeper;
 
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.NotNull;
 
-public class GleeperModel extends HierarchicalModel<Gleeper> {
-	private final ModelPart root;
+public class GleeperModel extends EntityModel<GleeperRenderState> {
 	private final ModelPart head;
 	private final ModelPart body;
 	private final ModelPart leftHindLeg;
@@ -19,7 +17,7 @@ public class GleeperModel extends HierarchicalModel<Gleeper> {
 	private final ModelPart blossom;
 
 	public GleeperModel(ModelPart root) {
-        this.root = root;
+		super(root);
 		this.head = root.getChild("head");
 		this.body = root.getChild("body");
 		this.leftHindLeg = root.getChild("left_hind_leg");
@@ -29,12 +27,6 @@ public class GleeperModel extends HierarchicalModel<Gleeper> {
 		this.blossomStem = this.head.getChild("blossom_stem");
 		this.blossom = this.head.getChild("blossom");
 	}
-
-    @Override
-    @NotNull
-    public ModelPart root() {
-        return root;
-    }
 
 	public static LayerDefinition createBodyLayer() {
 		MeshDefinition mesh = new MeshDefinition();
@@ -66,15 +58,18 @@ public class GleeperModel extends HierarchicalModel<Gleeper> {
 	}
 
 	@Override
-	public void setupAnim(@NotNull Gleeper entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
-		this.head.xRot = headPitch * (float) (Math.PI / 180.0);
-		this.rightHindLeg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-		this.leftHindLeg.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-		this.rightFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-		this.leftFrontLeg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+	public void setupAnim(GleeperRenderState state) {
+		this.head.yRot = state.yRot * (float) (Math.PI / 180.0);
+		this.head.xRot = state.xRot * (float) (Math.PI / 180.0);
 
-		this.blossomStem.visible = !entity.isSheared();
-		this.blossom.visible = !entity.isSheared();
+		float animationSpeed = state.walkAnimationSpeed;
+		float animationPos = state.walkAnimationPos;
+		this.rightHindLeg.xRot = Mth.cos(animationPos * 0.6662F) * 1.4F * animationSpeed;
+		this.leftHindLeg.xRot = Mth.cos(animationPos * 0.6662F + (float) Math.PI) * 1.4F * animationSpeed;
+		this.rightFrontLeg.xRot = Mth.cos(animationPos * 0.6662F + (float) Math.PI) * 1.4F * animationSpeed;
+		this.leftFrontLeg.xRot = Mth.cos(animationPos * 0.6662F) * 1.4F * animationSpeed;
+
+		this.blossomStem.visible = !state.sheared;
+		this.blossom.visible = !state.sheared;
 	}
 }

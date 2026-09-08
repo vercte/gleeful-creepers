@@ -25,13 +25,13 @@ public class SiezeGoal<T extends LivingEntity> extends Goal {
 
     @Override
     public boolean canUse() {
-        this.toAvoid = this.creeper.level()
+        this.toAvoid = getServerLevel(this.creeper)
                 .getNearestEntity(
                         this.creeper.level().getEntitiesOfClass(
                                 this.avoidClass,
                                 this.creeper.getBoundingBox()
                                         .inflate(this.maxDist, 3, this.maxDist),
-                                m -> true
+                                _ -> true
                         ),
                         this.avoidEntityTargeting,
                         this.creeper,

@@ -1,20 +1,18 @@
 package net.vercte.gleefulcreepers;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
@@ -70,17 +68,17 @@ public class GleefulCreepers {
     public static final Supplier<EntityType<Gleeper>> GLEEPER = ENTITY_TYPES.register(
             "gleeper",
             () -> EntityType.Builder.of(Gleeper::new, MobCategory.MONSTER).sized(0.6f, 1.5f).clientTrackingRange(8).eyeHeight(1.25f)
-                    .build("gleeful_creepers:gleeper")
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, at("gleeper")))
     );
 
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ID);
 
-    public static final DeferredItem<DeferredSpawnEggItem> GLEEPER_SPAWN_EGG = ITEMS.register(
+    public static final DeferredItem<SpawnEggItem> GLEEPER_SPAWN_EGG = ITEMS.register(
             "gleeper_spawn_egg",
-            () -> new DeferredSpawnEggItem(GLEEPER, 0x70922d, 0xfd87cf, new Item.Properties())
+            () -> new SpawnEggItem(new Item.Properties().spawnEgg(GLEEPER.get()))
     );
 
-    public static ResourceLocation at(String path) {
-        return ResourceLocation.fromNamespaceAndPath(ID, path);
+    public static Identifier at(String path) {
+        return Identifier.fromNamespaceAndPath(ID, path);
     }
 }

@@ -14,8 +14,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -34,8 +36,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.MossBlock;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.Vec3;
 import net.vercte.gleefulcreepers.GleefulConfig;
@@ -364,6 +369,30 @@ public class Gleeper extends Monster implements Shearable {
         if(tag.contains("AngerTarget", Tag.TAG_INT_ARRAY)) {
             this.angerTarget = tag.getUUID("AngerTarget");
             setAngered(true);
+        }
+    }
+
+    public static boolean checkGleeperSpawnRules(
+            EntityType<? extends Gleeper> type, ServerLevelAccessor level, MobSpawnType mobSpawnType, BlockPos pos, RandomSource random
+    ) {
+        return level.getDifficulty() != Difficulty.PEACEFUL
+                && (MobSpawnType.ignoresLightRequirements(mobSpawnType) || isDarkEnoughToSpawn(level, pos, random))
+                && checkMobSpawnRules(type, level, mobSpawnType, pos, random);
+    }
+
+    public static boolean isDarkEnoughToSpawn(ServerLevelAccessor accessor, @NotNull BlockPos pos, RandomSource random) {
+        if (accessor.getBrightness(LightLayer.SKY, pos) > random.nextInt(32)) {
+            return false;
+        } else {
+            DimensionType dimensiontype = accessor.dimensionType();
+            int defaultLimit = dimensiontype.monsterSpawnBlockLightLimit();
+            int lightLimit = Math.min(defaultLimit + 4, 15);
+            if (lightLimit < 15 && accessor.getBrightness(LightLayer.BLOCK, pos) > lightLimit) {
+                return false;
+            } else {
+                int j = accessor.getLevel().isThundering() ? accessor.getMaxLocalRawBrightness(pos, 10) : accessor.getMaxLocalRawBrightness(pos);
+                return j <= dimensiontype.monsterSpawnLightTest().sample(random);
+            }
         }
     }
 

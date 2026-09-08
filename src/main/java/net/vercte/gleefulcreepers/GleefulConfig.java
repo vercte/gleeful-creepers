@@ -31,10 +31,5 @@ public class GleefulConfig {
             .worldRestart()
             .define("walksWhileSwelling", true);
 
-    public static final ModConfigSpec.BooleanValue REPLACE_CREEPER_SPAWNS = BUILDER
-            .comment("Whether the Gleeper should replace the Creeper in biomes tagged #gleeful_creepers:gleeper_spawns_in.")
-            .worldRestart()
-            .define("replaceCreeperSpawns", true);
-
     static final ModConfigSpec SPEC = BUILDER.build();
 }

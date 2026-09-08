@@ -47,7 +47,7 @@ public class GleefulCreepers implements ModInitializer {
         SpawnPlacements.register(GLEEPER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
         BiomeModifications.create(at("replace_creepers_in_lush_caves"))
                 .add(ModificationPhase.REPLACEMENTS, lushCave, ctx -> {
-                    if(GleefulConfig.REPLACE_CREEPER_SPAWNS.get()) ctx.getSpawnSettings().removeSpawns(creeper);
+                    ctx.getSpawnSettings().removeSpawns(creeper);
                     ctx.getSpawnSettings().addSpawn(MobCategory.MONSTER, gleeper);
                 });
     }

@@ -1,18 +1,30 @@
 package net.vercte.gleefulcreepers;
 
+import com.mojang.logging.LogUtils;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.biome.v1.BiomeModification;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
+import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.fml.config.ModConfig;
 import net.vercte.gleefulcreepers.gleeper.Gleeper;
+
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 // TODO gleeper spawning
 public class GleefulCreepers implements ModInitializer {
@@ -22,10 +34,26 @@ public class GleefulCreepers implements ModInitializer {
     public void onInitialize() {
         GleefulSounds.loadAndRegister();
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(this::buildCreativeTabs);
-        FabricDefaultAttributeRegistry.register(GLEEPER, Gleeper.createAttributes()); // fixme: huh
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(this::buildCreativeTabs);
+        FabricDefaultAttributeRegistry.register(GLEEPER, Gleeper.createAttributes());
+
+        handleSpawning();
 
         NeoForgeConfigRegistry.INSTANCE.register(ID, ModConfig.Type.SERVER, GleefulConfig.SPEC);
+    }
+
+    private void handleSpawning() {
+        Predicate<BiomeSelectionContext> lushCave = p -> p.getBiomeKey().equals(Biomes.LUSH_CAVES); // TODO: use tag
+        BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> creeper = (m, s) -> s.type.equals(EntityType.CREEPER);
+
+        MobSpawnSettings.SpawnerData gleeper = new MobSpawnSettings.SpawnerData(GLEEPER, 4, 4, 150);
+
+        SpawnPlacements.register(GLEEPER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
+        BiomeModifications.create(at("replace_creepers_in_lush_caves"))
+                .add(ModificationPhase.REPLACEMENTS, lushCave, ctx -> {
+                    ctx.getSpawnSettings().removeSpawns(creeper);
+                    ctx.getSpawnSettings().addSpawn(MobCategory.MONSTER, gleeper);
+                });
     }
 
     private void buildCreativeTabs(FabricItemGroupEntries entries) {

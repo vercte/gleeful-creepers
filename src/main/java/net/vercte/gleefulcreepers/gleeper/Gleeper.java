@@ -4,8 +4,6 @@ import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -29,8 +27,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.sensing.Sensing;
-import net.minecraft.world.entity.animal.Cat;
-import net.minecraft.world.entity.animal.Ocelot;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.animal.feline.Ocelot;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -40,9 +38,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.MossBlock;
+import net.minecraft.world.level.block.BonemealableFeaturePlacerBlock;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.gameevent.*;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulSounds;
@@ -57,7 +57,7 @@ import org.jetbrains.annotations.Nullable;
 import net.vercte.gleefulcreepers.util.access.LivingEntityAccessor;
 
 import java.util.Collection;
-import java.util.UUID;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 public class Gleeper extends Monster implements Shearable {
@@ -76,7 +76,7 @@ public class Gleeper extends Monster implements Shearable {
     private int angerTimeMax = 0;
     private int angerTime = 0;
 
-    @Nullable private UUID angerTarget;
+    @Nullable private EntityReference<LivingEntity> angerTarget;
 
     private final Listener listener = new Listener();
     private final DynamicGameEventListener<Listener> dynamicListener = new DynamicGameEventListener<>(listener);
@@ -140,15 +140,15 @@ public class Gleeper extends Monster implements Shearable {
     }
 
     private void explodeCreeper() {
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide() && level() instanceof ServerLevel serverLevel) {
             this.dead = true;
             this.level().explode(this, this.getX(), this.getY(), this.getZ(), GleefulConfig.EXPLOSION_RADIUS.get(), GleefulConfig.getExplosionLevel());
             ((ServerLevel)level()).sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR, this.getX(), this.getY() + 1, this.getZ(), 48, 0, 0,0, 1);
 
-            if(GleefulConfig.EXPLOSION_CREATES_FLORA.get()) ((MossBlock)Blocks.MOSS_BLOCK).performBonemeal((ServerLevel)level(), getRandom(), blockPosition().below(), Blocks.MOSS_BLOCK.defaultBlockState());
+            if(GleefulConfig.EXPLOSION_CREATES_FLORA.get()) ((BonemealableFeaturePlacerBlock)Blocks.MOSS_BLOCK).performBonemeal((ServerLevel)level(), getRandom(), blockPosition().below(), Blocks.MOSS_BLOCK.defaultBlockState());
 
             this.spawnLingeringCloud();
-            this.triggerOnDeathMobEffects(RemovalReason.KILLED);
+            this.triggerOnDeathMobEffects(serverLevel, RemovalReason.KILLED);
             this.discard();
         }
     }
@@ -160,8 +160,9 @@ public class Gleeper extends Monster implements Shearable {
             cloud.setRadius(2.5F);
             cloud.setRadiusOnUse(-0.5F);
             cloud.setWaitTime(10);
-            cloud.setDuration(cloud.getDuration() / 2);
-            cloud.setRadiusPerTick(-cloud.getRadius() / (float)cloud.getDuration());
+            cloud.setPotionDurationScale(0.25F);
+            cloud.setDuration(300);
+            cloud.setRadiusPerTick(-cloud.getRadius() / cloud.getDuration());
 
             for(MobEffectInstance instance : collection) {
                 cloud.addEffect(new MobEffectInstance(instance));
@@ -177,22 +178,22 @@ public class Gleeper extends Monster implements Shearable {
         if (stack.is(ItemTags.CREEPER_IGNITERS)) {
             SoundEvent soundevent = stack.is(Items.FIRE_CHARGE) ? SoundEvents.FIRECHARGE_USE : SoundEvents.FLINTANDSTEEL_USE;
             this.level().playSound(player, this.getX(), this.getY(), this.getZ(), soundevent, this.getSoundSource(), 1.0F, this.random.nextFloat() * 0.4F + 0.8F);
-            if (!this.level().isClientSide) {
+            if (!this.level().isClientSide()) {
                 this.ignite();
                 if (!stack.isDamageableItem()) {
                     stack.shrink(1);
                 } else {
-                    stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 }
             }
 
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
+            return InteractionResult.SUCCESS;
         }
 
         if(stack.is(ConventionalItemTags.FERTILIZERS) && isSheared()) {
             this.level().playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.BONE_MEAL_USE, this.getSoundSource(), 1.0F, 1.0F);
 
-            if(this.level().isClientSide) {
+            if(this.level().isClientSide()) {
                 for(int i = 0; i < 5; ++i) {
                     double xv = getRandom().nextGaussian() * 0.02;
                     double yv = getRandom().nextGaussian() * 0.02;
@@ -204,16 +205,16 @@ public class Gleeper extends Monster implements Shearable {
                 }
             }
 
-            if(!this.level().isClientSide) {
+            if(!this.level().isClientSide()) {
                 if(getRandom().nextInt(3) == 0) setSheared(false);
                 if (!stack.isDamageableItem()) {
                     stack.shrink(1);
                 } else {
-                    stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 }
             }
 
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
+            return InteractionResult.SUCCESS;
         }
 
         if (stack.is(Items.SHEARS)) {
@@ -307,23 +308,20 @@ public class Gleeper extends Monster implements Shearable {
         return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.25F).add(Attributes.ATTACK_DAMAGE, 0).add(Attributes.MAX_HEALTH, 12);
     }
 
-    public void setAngerTarget(@Nullable UUID target) {
+    public void setAngerTarget(final @Nullable EntityReference<LivingEntity> target) {
         this.angerTarget = target;
     }
 
     @Nullable
-    public UUID getAngerTarget() {
+    public EntityReference<LivingEntity> getAngerTarget() {
         return this.angerTarget;
     }
 
     @Nullable
     public LivingEntity getAngerTargetEntity() {
-        if(angerTarget == null || !(level() instanceof ServerLevel serverLevel)) return null;
+        if(angerTarget == null) return null;
 
-        Entity angeredAt = serverLevel.getEntity(angerTarget);
-        if(!(angeredAt instanceof LivingEntity living)) return null;
-
-        return living;
+        return angerTarget.getEntity(level(), LivingEntity.class);
     }
 
     @Override
@@ -335,7 +333,7 @@ public class Gleeper extends Monster implements Shearable {
     }
 
     public boolean isInvalidTarget(LivingEntity entity) {
-        return entity.getType().is(GleefulTags.GLEEPER_FORGIVES) || !entity.isAlive() || !this.canAttack(entity);
+        return entity.is(GleefulTags.GLEEPER_FORGIVES) || !entity.isAlive() || !this.canAttack(entity);
     }
 
     @NotNull
@@ -348,37 +346,36 @@ public class Gleeper extends Monster implements Shearable {
         return GleefulSounds.GLEEPER_DEATH;
     }
 
-    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-
-        tag.putShort("Fuse", (short)this.maxSwell);
-        tag.putBoolean("Ignited", this.isIgnited());
-        tag.putBoolean("Sheared", isSheared());
-        tag.putInt("AngerTime", angerTime);
-        tag.putInt("AngerTimeMax", angerTimeMax);
-        if(this.getAngerTarget() != null) tag.putUUID("AngerTarget", this.getAngerTarget());
+    @Override
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putShort("Fuse", (short)this.maxSwell);
+        output.putBoolean("Ignited", this.isIgnited());
+        output.putBoolean("Sheared", this.isSheared());
+        output.putInt("AngerTime", angerTime);
+        output.putInt("AngerTimeMax", angerTimeMax);
+        output.storeNullable("AngerTarget", EntityReference.codec(), this.getAngerTarget());
     }
 
-    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-
-        if(tag.contains("Fuse", Tag.TAG_ANY_NUMERIC)) this.maxSwell = tag.getShort("Fuse");
-        if(tag.getBoolean("Ignited")) this.ignite();
-        setSheared(tag.getBoolean("Sheared"));
-        angerTime = tag.getInt("AngerTime");
-        angerTimeMax = tag.getInt("AngerTimeMax");
-        if(tag.contains("AngerTarget", Tag.TAG_INT_ARRAY)) {
-            this.angerTarget = tag.getUUID("AngerTarget");
-            setAngered(true);
+    @Override
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.maxSwell = input.getShortOr("Fuse", (short)30);
+        this.setSheared(input.getBooleanOr("Sheared", false));
+        this.angerTime = input.getIntOr("AngerTime", 0);
+        this.angerTimeMax = input.getIntOr("AngerTimeMax", 0);
+        this.setAngerTarget(EntityReference.read(input, "AngerTarget"));
+        if (input.getBooleanOr("ignited", false)) {
+            this.ignite();
         }
     }
 
     public static boolean checkGleeperSpawnRules(
-            EntityType<? extends Gleeper> type, ServerLevelAccessor level, MobSpawnType mobSpawnType, BlockPos pos, RandomSource random
+            EntityType<? extends Gleeper> type, ServerLevelAccessor level, EntitySpawnReason reason, BlockPos pos, RandomSource random
     ) {
         return level.getDifficulty() != Difficulty.PEACEFUL
-                && (MobSpawnType.ignoresLightRequirements(mobSpawnType) || isDarkEnoughToSpawn(level, pos, random))
-                && checkMobSpawnRules(type, level, mobSpawnType, pos, random);
+                && (EntitySpawnReason.ignoresLightRequirements(reason) || isDarkEnoughToSpawn(level, pos, random))
+                && checkMobSpawnRules(type, level, reason, pos, random);
     }
 
     public static boolean isDarkEnoughToSpawn(ServerLevelAccessor accessor, @NotNull BlockPos pos, RandomSource random) {
@@ -456,7 +453,7 @@ public class Gleeper extends Monster implements Shearable {
             if(!sensing.hasLineOfSight(victim) && !sensing.hasLineOfSight(offender)) return false;
 
             Gleeper.this.setAngered(true);
-            Gleeper.this.setAngerTarget(offender.getUUID());
+            Gleeper.this.setAngerTarget(EntityReference.of(offender));
             Gleeper.this.startAngerTime(PERSISTENT_ANGER_TIME.sample(random));
             Gleeper.this.playSound(GleefulSounds.GLEEPER_ANGER, 1, 0.9f + (random.nextFloat() * 0.2f));
 

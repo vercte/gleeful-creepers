@@ -6,7 +6,7 @@ plugins {
     id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
 
-version = "${mod_version}+${minecraft_version}-${mod_loader.toLowerCase(Locale.ENGLISH)}"
+version = mod_version
 group = mod_group_id
 
 repositories {
@@ -14,7 +14,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    archivesName = "${mod_id}-${mod_loader.toLowerCase(Locale.ENGLISH)}-${minecraft_version}"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -106,7 +106,7 @@ publishMods {
     changelog = rootProject.file("CHANGELOG-LATEST.md").text // thank you evanbones
     type = STABLE
     file = tasks.named("jar").flatMap { it.archiveFile }
-    version = "${project.version}"
+    version = "${project.version}+${mod_loader.toLowerCase(Locale.ENGLISH)}-${minecraft_version}"
     displayName = "${mod_name} ${project.version} for ${mod_loader} ${minecraft_version}"
     modLoaders.add(mod_loader.toLowerCase(Locale.ENGLISH))
 

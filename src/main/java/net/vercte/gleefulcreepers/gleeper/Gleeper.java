@@ -38,6 +38,7 @@ import net.minecraft.world.level.block.MossBlock;
 import net.minecraft.world.level.gameevent.*;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.IShearable;
+import net.neoforged.neoforge.common.Tags;
 import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulSounds;
 import net.vercte.gleefulcreepers.GleefulTags;
@@ -184,7 +185,7 @@ public class Gleeper extends Monster implements IShearable {
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
 
-        if(stack.is(GleefulTags.ACTS_AS_BONE_MEAL) && isSheared()) {
+        if(stack.is(Tags.Items.FERTILIZERS) && isSheared()) {
             this.level().playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.BONE_MEAL_USE, this.getSoundSource(), 1.0F, 1.0F);
 
             if(this.level().isClientSide) {

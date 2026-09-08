@@ -1,0 +1,5 @@
+{
+  "type": "neoforge:remove_spawns",
+  "biomes": "#gleeful_creepers:gleeper_spawns_in",
+  "entity_types": "minecraft:creeper"
+}

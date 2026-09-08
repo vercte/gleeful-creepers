@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#gleeful_creepers:gleeper_spawns_in",
+  "spawners": {
+    "type": "gleeful_creepers:gleeper",
+    "maxCount": 150,
+    "minCount": 4,
+    "weight": 4
+  }
+}

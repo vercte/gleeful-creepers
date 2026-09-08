@@ -10,16 +10,13 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ServerLevelAccessor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.vercte.gleefulcreepers.gleeper.Gleeper;
@@ -40,8 +37,6 @@ public class GleefulCreepers {
         bus.addListener(this::registerEntityAttributes);
         bus.addListener(this::buildCreativeTabs);
 
-        NeoForge.EVENT_BUS.addListener(this::replaceCreepers);
-
         bus.addListener(GleefulDatagen::gatherData);
 
         container.registerConfig(ModConfig.Type.SERVER, GleefulConfig.SPEC);
@@ -56,23 +51,6 @@ public class GleefulCreepers {
         // I originally put it after the Creeper spawn egg,
         // but it turns out the Spawn Eggs creative tab is sorted alphabetically
         event.insertAfter(Items.GHAST_SPAWN_EGG.getDefaultInstance(), GLEEPER_SPAWN_EGG.toStack(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-    }
-
-    public void replaceCreepers(FinalizeSpawnEvent event) {
-        boolean isNatural = event.getSpawnType().equals(MobSpawnType.NATURAL);
-        if(!isNatural) return;
-
-        boolean isCreeper = event.getEntity().getType().equals(EntityType.CREEPER);
-        if(!isCreeper) return;
-
-        BlockPos pos = event.getEntity().blockPosition();
-        ServerLevelAccessor level = event.getLevel();
-
-        if(!level.getBiome(pos).is(GleefulTags.GLEEPER_SPAWNS_IN)) return;
-
-        GLEEPER.get().spawn(level.getLevel(), pos, MobSpawnType.NATURAL);
-
-        event.setSpawnCancelled(true);
     }
 
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, ID);

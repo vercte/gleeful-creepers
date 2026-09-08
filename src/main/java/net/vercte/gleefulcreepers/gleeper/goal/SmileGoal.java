@@ -3,8 +3,8 @@ package net.vercte.gleefulcreepers.gleeper.goal;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.vercte.gleefulcreepers.gleeper.Gleeper;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 
 public class SmileGoal extends Goal {

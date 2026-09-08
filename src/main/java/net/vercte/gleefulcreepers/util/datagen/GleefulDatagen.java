@@ -1,32 +1,23 @@
 package net.vercte.gleefulcreepers.util.datagen;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.vercte.gleefulcreepers.util.datagen.assets.ItemModelGen;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.vercte.gleefulcreepers.util.datagen.assets.LangGen;
-import net.vercte.gleefulcreepers.util.datagen.assets.SoundGen;
+import net.vercte.gleefulcreepers.util.datagen.assets.ModelGen;
 import net.vercte.gleefulcreepers.util.datagen.data.BiomeTagGen;
 import net.vercte.gleefulcreepers.util.datagen.data.EntityTagGen;
-import net.vercte.gleefulcreepers.util.datagen.data.ItemTagGen;
 import net.vercte.gleefulcreepers.util.datagen.data.LootGen;
 
-import java.util.concurrent.CompletableFuture;
+public class GleefulDatagen implements DataGeneratorEntrypoint {
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        FabricDataGenerator.Pack pack = generator.createPack();
 
-public class GleefulDatagen {
-    public static void gatherData(GatherDataEvent event) {
-        PackOutput output = event.getGenerator().getPackOutput();
-        CompletableFuture<HolderLookup.Provider> registries = event.getLookupProvider();
-        ExistingFileHelper fileHelper = event.getExistingFileHelper();
+        pack.addProvider(ModelGen::new);
+        pack.addProvider(LangGen::new);
 
-        event.addProvider(new ItemModelGen(output, fileHelper));
-        event.addProvider(new LangGen(output));
-        event.addProvider(new SoundGen(output, fileHelper));
-
-        event.addProvider(new LootGen(output, registries));
-        event.addProvider(new ItemTagGen(output, registries));
-        event.addProvider(new EntityTagGen(output, registries, fileHelper));
-        event.addProvider(new BiomeTagGen(output, registries, fileHelper));
+        pack.addProvider(LootGen::new);
+        pack.addProvider(EntityTagGen::new);
+        pack.addProvider(BiomeTagGen::new);
     }
 }

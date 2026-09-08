@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": [
+    "Vercte"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/gleeful-creepers",
+    "sources": "https://github.com/vercte/gleeful-creepers"
+  },
+  "license": "${mod_license}",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.vercte.gleefulcreepers.GleefulCreepers"
+    ],
+    "client": [
+      "net.vercte.gleefulcreepers.client.GleefulCreepersClient"
+    ],
+    "fabric-datagen": [
+      "net.vercte.gleefulcreepers.util.datagen.GleefulDatagen"
+    ]
+  },
+  "mixins": [
+    "gleeful_creepers.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.2",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "forgeconfigapiport": "*"
+  }
+}

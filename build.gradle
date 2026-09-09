@@ -84,7 +84,7 @@ publishing {
 publishMods {
     changelog = rootProject.file("CHANGELOG-LATEST.md").text // thank you evanbones
     type = STABLE
-    file = tasks.named("jar").flatMap { it.archiveFile }
+    file = tasks.named("remapJar").flatMap { it.archiveFile }
     version = "${project.version}+${mod_loader.toLowerCase(Locale.ENGLISH)}-${minecraft_version}"
     displayName = "${mod_name} ${project.version} for ${mod_loader} ${minecraft_version}"
     modLoaders.add(mod_loader.toLowerCase(Locale.ENGLISH))

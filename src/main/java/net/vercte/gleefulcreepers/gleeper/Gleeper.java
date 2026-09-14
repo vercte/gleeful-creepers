@@ -410,6 +410,11 @@ public class Gleeper extends Monster implements IForgeShearable {
         return List.of(Items.SPORE_BLOSSOM.getDefaultInstance());
     }
 
+    @Override
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
+        return 1.25f;
+    }
+
     public class Listener implements GameEventListener {
         private final EntityPositionSource positionSource = new EntityPositionSource(Gleeper.this, Gleeper.this.getEyeHeight());
 

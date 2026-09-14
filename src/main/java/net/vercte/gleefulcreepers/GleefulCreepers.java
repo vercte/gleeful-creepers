@@ -1,6 +1,6 @@
 package net.vercte.gleefulcreepers;
 
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
@@ -15,7 +15,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.neoforged.fml.config.ModConfig;
+import net.minecraftforge.fml.config.ModConfig;
 import net.vercte.gleefulcreepers.gleeper.Gleeper;
 
 import java.util.function.BiPredicate;
@@ -34,7 +34,7 @@ public class GleefulCreepers implements ModInitializer {
 
         handleSpawning();
 
-        NeoForgeConfigRegistry.INSTANCE.register(ID, ModConfig.Type.SERVER, GleefulConfig.SPEC);
+        ForgeConfigRegistry.INSTANCE.register(ID, ModConfig.Type.SERVER, GleefulConfig.SPEC);
     }
 
     private void handleSpawning() {
@@ -43,7 +43,7 @@ public class GleefulCreepers implements ModInitializer {
 
         MobSpawnSettings.SpawnerData gleeper = new MobSpawnSettings.SpawnerData(GLEEPER, 200, 4, 4);
 
-        SpawnPlacements.register(GLEEPER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Gleeper::checkGleeperSpawnRules);
+        SpawnPlacements.register(GLEEPER, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Gleeper::checkGleeperSpawnRules);
         BiomeModifications.create(at("replace_creepers_in_lush_caves"))
                 .add(ModificationPhase.REPLACEMENTS, lushCave, ctx -> {
                     ctx.getSpawnSettings().removeSpawns(creeper);
@@ -57,27 +57,10 @@ public class GleefulCreepers implements ModInitializer {
         entries.addAfter(Items.GHAST_SPAWN_EGG.getDefaultInstance(), GLEEPER_SPAWN_EGG.getDefaultInstance());
     }
 
-//    public void replaceCreepers(FinalizeSpawnEvent event) {
-//        boolean isNatural = event.getSpawnType().equals(MobSpawnType.NATURAL);
-//        if(!isNatural) return;
-//
-//        boolean isCreeper = event.getEntity().getType().equals(EntityType.CREEPER);
-//        if(!isCreeper) return;
-//
-//        BlockPos pos = event.getEntity().blockPosition();
-//        ServerLevelAccessor level = event.getLevel();
-//
-//        if(!level.getBiome(pos).is(GleefulTags.GLEEPER_SPAWNS_IN)) return;
-//
-//        GLEEPER.get().spawn(level.getLevel(), pos, MobSpawnType.NATURAL);
-//
-//        event.setSpawnCancelled(true);
-//    }
-
     public static final EntityType<Gleeper> GLEEPER = Registry.register(
             BuiltInRegistries.ENTITY_TYPE,
             at("gleeper"),
-            EntityType.Builder.of(Gleeper::new, MobCategory.MONSTER).sized(0.6f, 1.5f).clientTrackingRange(8).eyeHeight(1.25f)
+            EntityType.Builder.of(Gleeper::new, MobCategory.MONSTER).sized(0.6f, 1.5f).clientTrackingRange(8)
                     .build("gleeful_creepers:gleeper")
     );
 
@@ -88,6 +71,6 @@ public class GleefulCreepers implements ModInitializer {
     );
 
     public static ResourceLocation at(String path) {
-        return ResourceLocation.fromNamespaceAndPath(ID, path);
+        return new ResourceLocation(ID, path);
     }
 }

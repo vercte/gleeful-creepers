@@ -1,8 +1,6 @@
 package net.vercte.gleefulcreepers.gleeper;
 
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -148,7 +146,6 @@ public class Gleeper extends Monster implements Shearable {
             if(GleefulConfig.EXPLOSION_CREATES_FLORA.get()) ((MossBlock)Blocks.MOSS_BLOCK).performBonemeal((ServerLevel)level(), getRandom(), blockPosition().below(), Blocks.MOSS_BLOCK.defaultBlockState());
 
             this.spawnLingeringCloud();
-            this.triggerOnDeathMobEffects(RemovalReason.KILLED);
             this.discard();
         }
     }
@@ -182,14 +179,14 @@ public class Gleeper extends Monster implements Shearable {
                 if (!stack.isDamageableItem()) {
                     stack.shrink(1);
                 } else {
-                    stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                 }
             }
 
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
 
-        if(stack.is(ConventionalItemTags.FERTILIZERS) && isSheared()) {
+        if(stack.is(Items.BONE_MEAL) && isSheared()) { // FIXME: If you are a mod(pack) dev and really want this to be a tag, make a issue or PR and I'll do it.
             this.level().playSound(player, this.getX(), this.getY(), this.getZ(), SoundEvents.BONE_MEAL_USE, this.getSoundSource(), 1.0F, 1.0F);
 
             if(this.level().isClientSide) {
@@ -209,7 +206,7 @@ public class Gleeper extends Monster implements Shearable {
                 if (!stack.isDamageableItem()) {
                     stack.shrink(1);
                 } else {
-                    stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                 }
             }
 
@@ -220,7 +217,7 @@ public class Gleeper extends Monster implements Shearable {
             if (!this.level().isClientSide && this.readyForShearing()) {
                 this.shear(SoundSource.PLAYERS);
                 this.gameEvent(GameEvent.SHEAR, player);
-                stack.hurtAndBreak(1, player, getSlotForHand(hand));
+                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                 return InteractionResult.SUCCESS;
             } else {
                 return InteractionResult.CONSUME;
@@ -290,13 +287,13 @@ public class Gleeper extends Monster implements Shearable {
         this.angerTime = time;
     }
 
-    protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DATA_SWELL_DIR, 0);
-        builder.define(DATA_IS_IGNITED, false);
-        builder.define(DATA_SEIZED, false);
-        builder.define(DATA_ANGERED, false);
-        builder.define(DATA_SHEARED, false);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_SWELL_DIR, 0);
+        this.entityData.define(DATA_IS_IGNITED, false);
+        this.entityData.define(DATA_SEIZED, false);
+        this.entityData.define(DATA_ANGERED, false);
+        this.entityData.define(DATA_SHEARED, false);
     }
 
     public float getSwelling(float pt) {
@@ -377,7 +374,7 @@ public class Gleeper extends Monster implements Shearable {
             EntityType<? extends Gleeper> type, ServerLevelAccessor level, MobSpawnType mobSpawnType, BlockPos pos, RandomSource random
     ) {
         return level.getDifficulty() != Difficulty.PEACEFUL
-                && (MobSpawnType.ignoresLightRequirements(mobSpawnType) || isDarkEnoughToSpawn(level, pos, random))
+                && isDarkEnoughToSpawn(level, pos, random)
                 && checkMobSpawnRules(type, level, mobSpawnType, pos, random);
     }
 
@@ -438,12 +435,12 @@ public class Gleeper extends Monster implements Shearable {
 
         @Override
         public int getListenerRadius() {
-            return GameEvent.ENTITY_DAMAGE.value().notificationRadius();
+            return GameEvent.ENTITY_DAMAGE.getNotificationRadius();
         }
 
         @Override
-        public boolean handleGameEvent(@NotNull ServerLevel serverLevel, @NotNull Holder<GameEvent> event, @NotNull GameEvent.Context context, @NotNull Vec3 pos) {
-            if(!event.is(GameEvent.ENTITY_DAMAGE.key()) && !event.is(GameEvent.ENTITY_DIE.key())) return false;
+        public boolean handleGameEvent(@NotNull ServerLevel serverLevel, @NotNull GameEvent event, @NotNull GameEvent.Context context, @NotNull Vec3 pos) {
+            if(event != GameEvent.ENTITY_DAMAGE && event != GameEvent.ENTITY_DIE) return false;
 
             if(!(context.sourceEntity() instanceof LivingEntity victim)) return false;
 

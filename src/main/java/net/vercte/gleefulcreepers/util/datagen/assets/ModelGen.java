@@ -26,7 +26,7 @@ public class ModelGen extends FabricModelProvider {
         itemModelGenerator.generateFlatItem(
                 GleefulCreepers.GLEEPER_SPAWN_EGG,
                 new ModelTemplate(
-                        Optional.of(ResourceLocation.withDefaultNamespace("item/template_spawn_egg")),
+                        Optional.of(new ResourceLocation("minecraft", "item/template_spawn_egg")),
                         Optional.empty()
                 )
         );

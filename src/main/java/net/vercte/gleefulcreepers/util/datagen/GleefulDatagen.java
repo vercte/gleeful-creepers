@@ -64,7 +64,7 @@ public class GleefulDatagen {
                             new BiomeModifiers.AddSpawnsBiomeModifier(
                                     biomes.getOrThrow(GleefulTags.GLEEPER_SPAWNS_IN),
                                     WeightedList.<MobSpawnSettings.SpawnerData>builder()
-                                            .add(gleeperSpawnerData, 100)
+                                            .add(gleeperSpawnerData, 200)
                                             .build()
                             )
                     );

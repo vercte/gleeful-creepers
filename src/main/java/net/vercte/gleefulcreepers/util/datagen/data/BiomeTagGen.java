@@ -6,7 +6,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import net.vercte.gleefulcreepers.GleefulCreepers;
 import net.vercte.gleefulcreepers.GleefulTags;
 import org.jetbrains.annotations.NotNull;

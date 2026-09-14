@@ -1,8 +1,8 @@
 package net.vercte.gleefulcreepers.util.datagen.assets;
 
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.data.LanguageProvider;
 import net.vercte.gleefulcreepers.GleefulConfig;
 import net.vercte.gleefulcreepers.GleefulCreepers;
 
@@ -11,7 +11,7 @@ public class LangGen extends LanguageProvider {
         super(output, GleefulCreepers.ID, "en_us");
     }
 
-    static final String SOUND_GLEEPER_ANGER= "sound.gleeful_creepers.gleeper_anger";
+    static final String SOUND_GLEEPER_ANGER = "sound.gleeful_creepers.gleeper_anger";
     static final String SOUND_GLEEPER_HURT = "sound.gleeful_creepers.gleeper_hurt";
     static final String SOUND_GLEEPER_DEATH = "sound.gleeful_creepers.gleeper_death";
 
@@ -30,8 +30,8 @@ public class LangGen extends LanguageProvider {
         addConfig(GleefulConfig.WALKS_WHILE_SWELLING, "Walks While Swelling");
     }
 
-    private void addConfig(ModConfigSpec.ConfigValue<?> value, String text) {
-        addConfig(value.getPath().getLast(), text);
+    private void addConfig(ForgeConfigSpec.ConfigValue<?> value, String text) {
+        addConfig(value.getPath().get(value.getPath().size()-1), text);
     }
 
     private void addConfig(String path, String text) {

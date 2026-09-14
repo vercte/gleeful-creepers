@@ -1,14 +1,14 @@
 package net.vercte.gleefulcreepers;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Supplier;
 
 public class GleefulSounds {
-    private static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, GleefulCreepers.ID);
+    private static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, GleefulCreepers.ID);
 
     public static final Supplier<SoundEvent> GLEEPER_ANGER = dynamicRange("entity.gleeper.anger");
     public static final Supplier<SoundEvent> GLEEPER_HURT = dynamicRange("entity.gleeper.hurt");

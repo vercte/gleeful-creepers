@@ -1,8 +1,11 @@
 package net.vercte.gleefulcreepers.util.datagen.assets;
 
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.vercte.gleefulcreepers.GleefulCreepers;
 
 public class ItemModelGen extends ItemModelProvider {
@@ -12,6 +15,8 @@ public class ItemModelGen extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        spawnEggItem(GleefulCreepers.GLEEPER_SPAWN_EGG.get());
+        ResourceLocation egg = ForgeRegistries.ITEMS.getKey(GleefulCreepers.GLEEPER_SPAWN_EGG.get());
+        getBuilder(egg.toString())
+            .parent(new ModelFile.UncheckedModelFile("item/template_spawn_egg"));
     }
 }

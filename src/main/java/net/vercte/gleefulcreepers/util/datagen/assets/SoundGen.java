@@ -1,9 +1,9 @@
 package net.vercte.gleefulcreepers.util.datagen.assets;
 
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.common.data.SoundDefinition;
-import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.SoundDefinition;
+import net.minecraftforge.common.data.SoundDefinitionsProvider;
 import net.vercte.gleefulcreepers.GleefulCreepers;
 import net.vercte.gleefulcreepers.GleefulSounds;
 

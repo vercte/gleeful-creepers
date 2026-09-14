@@ -49,7 +49,7 @@ public class GleefulCreepers implements ModInitializer {
         BiomeModifications.create(at("replace_creepers_in_lush_caves"))
                 .add(ModificationPhase.REPLACEMENTS, lushCave, ctx -> {
                     ctx.getMobSpawnSettings().removeSpawns(creeper);
-                    ctx.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, gleeper, 100);
+                    ctx.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, gleeper, 200);
                 });
     }
 

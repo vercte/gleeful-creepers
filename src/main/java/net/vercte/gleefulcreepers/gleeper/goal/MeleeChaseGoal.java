@@ -11,7 +11,7 @@ public class MeleeChaseGoal extends MeleeAttackGoal {
     }
 
     @Override
-    protected void checkAndPerformAttack(@NotNull LivingEntity entity) {
+    protected void checkAndPerformAttack(@NotNull LivingEntity entity, double d) {
         // noop
     }
 }

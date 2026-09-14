@@ -25,7 +25,7 @@ public class PlayerMixin implements LivingEntityAccessor {
         return gleeful_creepers$attacker;
     }
 
-    @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;gameEvent(Lnet/minecraft/core/Holder;)V"))
+    @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;)V"))
     public void addAttackerInfo(DamageSource source, float f, CallbackInfo ci) {
         this.gleeful_creepers$attacker = source.getEntity() instanceof LivingEntity living ? living : null;
     }

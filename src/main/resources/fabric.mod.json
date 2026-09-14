@@ -23,9 +23,6 @@
     ],
     "fabric-datagen": [
       "net.vercte.gleefulcreepers.util.datagen.GleefulDatagen"
-    ],
-    "modmenu": [
-      "net.vercte.gleefulcreepers.client.GleefulCreepersModMenu"
     ]
   },
   "mixins": [
@@ -33,8 +30,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.19.2",
-    "minecraft": "1.21.1",
-    "java": ">=21",
+    "minecraft": "1.20.1",
+    "java": ">=17",
     "fabric-api": "*",
     "forgeconfigapiport": "*"
   }

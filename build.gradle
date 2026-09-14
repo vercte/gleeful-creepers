@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.144'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.144'
     id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
 
@@ -13,31 +13,48 @@ repositories {
     mavenLocal()
 }
 
+dependencies {
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
 base {
     archivesName = "${mod_id}-${mod_loader.toLowerCase(Locale.ENGLISH)}-${minecraft_version}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+    config "${mod_id}.mixins.json"
+}
 
-neoForge {
-    version = project.neo_version
+jar {
+    manifest.attributes([
+            "MixinConfigs": "${mod_id}.mixins.json"
+    ])
+}
+
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+obfuscation {
+    createRemappingConfiguration(configurations.localRuntime)
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+legacyForge {
+    version = project.forge_version
+    validateAccessTransformers = true
 
     runs {
         client {
             client()
-
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
             server()
             programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        gameTestServer {
-            type = "gameTestServer"
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
@@ -65,14 +82,11 @@ sourceSets.main.resources {
     srcDir 'src/generated/resources'
 }
 
-dependencies {
-}
-
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [minecraft_version      : minecraft_version,
                              minecraft_version_range: minecraft_version_range,
-                             neo_version            : neo_version,
-                             neo_version_range      : neo_version_range,
+                             forge_version          : forge_version,
+                             forge_version_range    : forge_version_range,
                              loader_version_range   : loader_version_range,
                              mod_id                 : mod_id,
                              mod_name               : mod_name,
@@ -87,7 +101,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 }
 
 sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
+legacyForge.ideSyncTask generateModMetadata
 
 publishing {
     publications {
@@ -122,9 +136,13 @@ publishMods {
     github {
         accessToken = providers.gradleProperty("GITHUB_PUBLISH_TOKEN").orNull
         repository = "vercte/gleeful-creepers"
-        tagName = "21.1/neo/${project.version}"
-        commitish = "21.1/neo/dev"
+        tagName = "20.1/forge/${project.version}"
+        commitish = "20.1/forge/dev"
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 idea {

@@ -3,7 +3,7 @@ package net.vercte.gleefulcreepers.util.datagen.data;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypeIds;
 import net.vercte.gleefulcreepers.GleefulCreepers;
 import net.vercte.gleefulcreepers.GleefulTags;
 import org.jetbrains.annotations.NotNull;
@@ -17,9 +17,9 @@ public class EntityTagGen extends FabricTagsProvider.EntityTypeTagsProvider {
 
     @Override
     protected void addTags(@NotNull HolderLookup.Provider provider) {
-        valueLookupBuilder(GleefulTags.GLEEPER_FORGIVES)
-                .add(EntityType.AXOLOTL)
-                .add(EntityType.BEE)
-                .add(GleefulCreepers.GLEEPER);
+        tag(GleefulTags.GLEEPER_FORGIVES)
+                .add(EntityTypeIds.AXOLOTL)
+                .add(EntityTypeIds.BEE)
+                .add(GleefulCreepers.GLEEPER_KEY);
     }
 }

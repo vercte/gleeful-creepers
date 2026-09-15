@@ -2,6 +2,7 @@ package net.vercte.gleefulcreepers.util.datagen.data;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableSubProvider;
+import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -39,7 +40,7 @@ public class LootGen extends SimpleFabricLootTableSubProvider {
     @Override
     public void generate(@NotNull BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer) {
         try {
-            HolderGetter<EntityType<?>> entities = registryLookup.get().lookup(Registries.ENTITY_TYPE).orElseThrow();;
+            HolderGetter<EntityType<?>> entities = registryLookup.get().lookup(Registries.ENTITY_TYPE).orElseThrow();
 
             biConsumer.accept(
                     GleefulCreepers.GLEEPER.getDefaultLootTable().get(),
@@ -66,7 +67,7 @@ public class LootGen extends SimpleFabricLootTableSubProvider {
                                             .add(TagEntry.expandTag(ItemTags.CREEPER_DROP_MUSIC_DISCS))
                                             .when(
                                                     LootItemEntityPropertyCondition.hasProperties(
-                                                            LootContext.EntityTarget.ATTACKER, EntityPre.Builder.entity().of(entities, EntityTypeTags.SKELETONS)
+                                                            LootContext.EntityTarget.ATTACKER, EntityPredicate.Builder.entity().of(entities, EntityTypeTags.SKELETONS)
                                                     )
                                             )
                             )

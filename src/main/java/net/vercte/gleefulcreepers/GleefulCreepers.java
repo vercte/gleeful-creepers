@@ -41,7 +41,7 @@ public class GleefulCreepers implements ModInitializer {
 
     private void handleSpawning() {
         Predicate<BiomeSelectionContext> lushCave = p -> p.getBiomeHolder().is(GleefulTags.GLEEPER_SPAWNS_IN);
-        BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> creeper = (m, s) -> s.type().equals(EntityType.CREEPER);
+        BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> creeper = (m, s) -> s.type().equals(EntityTypes.CREEPER);
 
         MobSpawnSettings.SpawnerData gleeper = new MobSpawnSettings.SpawnerData(GLEEPER, 4, 4);
 
@@ -59,6 +59,7 @@ public class GleefulCreepers implements ModInitializer {
         entries.insertAfter(Items.GHAST_SPAWN_EGG.getDefaultInstance(), GLEEPER_SPAWN_EGG.getDefaultInstance());
     }
 
+    public static final ResourceKey<EntityType<?>> GLEEPER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, at("gleeper"));
     public static final EntityType<Gleeper> GLEEPER = Registry.register(
             BuiltInRegistries.ENTITY_TYPE,
             at("gleeper"),

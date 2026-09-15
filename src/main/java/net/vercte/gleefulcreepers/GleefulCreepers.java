@@ -65,6 +65,7 @@ public class GleefulCreepers {
 
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, ID);
 
+    public static final ResourceKey<EntityType<?>> GLEEPER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, at("gleeper"));
     public static final Supplier<EntityType<Gleeper>> GLEEPER = ENTITY_TYPES.register(
             "gleeper",
             () -> EntityType.Builder.of(Gleeper::new, MobCategory.MONSTER).sized(0.6f, 1.5f).clientTrackingRange(8).eyeHeight(1.25f)

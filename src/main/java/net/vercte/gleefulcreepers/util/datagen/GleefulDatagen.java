@@ -8,7 +8,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedList;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
@@ -55,7 +55,7 @@ public class GleefulDatagen {
                     bootstrap.register(REMOVE_CREEPERS_FROM_LUSH_CAVES,
                             new BiomeModifiers.RemoveSpawnsBiomeModifier(
                                     biomes.getOrThrow(GleefulTags.GLEEPER_SPAWNS_IN),
-                                    HolderSet.direct(EntityType.CREEPER.builtInRegistryHolder())
+                                    HolderSet.direct(EntityTypes.CREEPER.builtInRegistryHolder())
                             )
                     );
 

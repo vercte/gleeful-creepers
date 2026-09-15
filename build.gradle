@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.146'
+    id 'net.neoforged.moddev' version '2.0.147'
     id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
 
@@ -120,8 +120,8 @@ publishMods {
     github {
         accessToken = providers.gradleProperty("GITHUB_PUBLISH_TOKEN").orNull
         repository = "vercte/gleeful-creepers"
-        tagName = "26.1/neo/${project.version}"
-        commitish = "26.1/neo/dev"
+        tagName = "26.2/neo/${project.version}"
+        commitish = "26.2/neo/dev"
     }
 }
 

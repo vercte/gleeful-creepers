@@ -2,7 +2,6 @@ package net.vercte.gleefulcreepers.util.datagen.data;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableSubProvider;
-import net.minecraft.advancements.criterion.EntityPredicate;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -67,7 +66,7 @@ public class LootGen extends SimpleFabricLootTableSubProvider {
                                             .add(TagEntry.expandTag(ItemTags.CREEPER_DROP_MUSIC_DISCS))
                                             .when(
                                                     LootItemEntityPropertyCondition.hasProperties(
-                                                            LootContext.EntityTarget.ATTACKER, EntityPredicate.Builder.entity().of(entities, EntityTypeTags.SKELETONS)
+                                                            LootContext.EntityTarget.ATTACKER, EntityPre.Builder.entity().of(entities, EntityTypeTags.SKELETONS)
                                                     )
                                             )
                             )

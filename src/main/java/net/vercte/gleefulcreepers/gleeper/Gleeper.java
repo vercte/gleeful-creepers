@@ -36,6 +36,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableFeaturePlacerBlock;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.gameevent.*;
@@ -145,7 +146,7 @@ public class Gleeper extends Monster implements IShearable {
             this.level().explode(this, this.getX(), this.getY(), this.getZ(), GleefulConfig.EXPLOSION_RADIUS.get(), GleefulConfig.getExplosionLevel());
             ((ServerLevel)level()).sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR, this.getX(), this.getY() + 1, this.getZ(), 48, 0, 0,0, 1);
 
-            if(GleefulConfig.EXPLOSION_CREATES_FLORA.get()) ((BonemealableFeaturePlacerBlock)Blocks.MOSS_BLOCK).performBonemeal((ServerLevel)level(), getRandom(), blockPosition().below(), Blocks.MOSS_BLOCK.defaultBlockState());
+            if(GleefulConfig.EXPLOSION_CREATES_FLORA.get()) ((BonemealableFeaturePlacerBlock)Blocks.MOSS_BLOCK).performBonemeal((ServerLevel)level(), getRandom(), blockPosition().below(), Blocks.MOSS_BLOCK.defaultBlockState(), BonemealSource.MOB);
 
             this.spawnLingeringCloud();
             this.triggerOnDeathMobEffects(serverLevel, RemovalReason.KILLED);

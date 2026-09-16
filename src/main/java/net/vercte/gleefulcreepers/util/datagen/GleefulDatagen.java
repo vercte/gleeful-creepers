@@ -1,13 +1,11 @@
 package net.vercte.gleefulcreepers.util.datagen;
 
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedList;
+import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -34,20 +32,39 @@ public class GleefulDatagen {
 
     public static void gatherData(GatherDataEvent.Client event) {
         PackOutput output = event.getGenerator().getPackOutput();
-        CompletableFuture<HolderLookup.Provider> registries = event.getLookupProvider();
+        CompletableFuture<HolderLookup.Provider> world = event.getWorldLookupProvider();
+        CompletableFuture<HolderLookup.Provider> reloadable = event.getReloadableLookupProvider();
 
         event.addProvider(new ModelGen(output));
         event.addProvider(new LangGen(output));
         event.addProvider(new SoundGen(output));
 
-        event.addProvider(new DatapackBuiltinEntriesProvider(output, event.getLookupProvider(), getRegistrySetBuilder(), Set.of(GleefulCreepers.ID)));
+        event.addProvider(
+                DatapackBuiltinEntriesProvider.forWorldLayer(
+                        output,
+                        "GleefulCreepersWorld",
+                        world,
+                        getWorldRegistrySetBuilder(),
+                        Set.of(GleefulCreepers.ID)
+                )
+        );
 
-        event.addProvider(new LootGen(output, registries));
-        event.addProvider(new EntityTagGen(output, registries));
-        event.addProvider(new BiomeTagGen(output, registries));
+        event.addProvider(
+                DatapackBuiltinEntriesProvider.forReloadableLayer(
+                        output,
+                        "GleefulCreepersReloadable",
+                        world,
+                        reloadable,
+                        getReloadableRegistrySetBuilder(),
+                        Set.of(GleefulCreepers.ID)
+                )
+        );
+
+        event.addProvider(new EntityTagGen(output, world));
+        event.addProvider(new BiomeTagGen(output, world));
     }
 
-    public static RegistrySetBuilder getRegistrySetBuilder() {
+    public static RegistrySetBuilder getWorldRegistrySetBuilder() {
         return new RegistrySetBuilder()
                 .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, bootstrap -> {
                     HolderGetter<Biome> biomes = bootstrap.lookup(Registries.BIOME);
@@ -59,7 +76,7 @@ public class GleefulDatagen {
                             )
                     );
 
-                    MobSpawnSettings.SpawnerData gleeperSpawnerData = new MobSpawnSettings.SpawnerData(GleefulCreepers.GLEEPER.get(), 4, 4);
+                    MobSpawnSettings.SpawnerData gleeperSpawnerData = new MobSpawnSettings.SpawnerData(GleefulCreepers.GLEEPER.get(), new ConstantInt(4));
                     bootstrap.register(ADD_GLEEPERS_TO_LUSH_CAVES,
                             new BiomeModifiers.AddSpawnsBiomeModifier(
                                     biomes.getOrThrow(GleefulTags.GLEEPER_SPAWNS_IN),
@@ -69,5 +86,10 @@ public class GleefulDatagen {
                             )
                     );
                 });
+    }
+
+    public static RegistrySetBuilder getReloadableRegistrySetBuilder() {
+        return new RegistrySetBuilder()
+                .add(Registries.LOOT_TABLE, new LootGen());
     }
 }

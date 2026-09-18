@@ -13,6 +13,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -23,7 +24,6 @@ import net.vercte.gleefulcreepers.gleeper.Gleeper;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-// TODO gleeper spawning
 public class GleefulCreepers implements ModInitializer {
     public static final String ID = "gleeful_creepers";
 
@@ -43,7 +43,7 @@ public class GleefulCreepers implements ModInitializer {
         Predicate<BiomeSelectionContext> lushCave = p -> p.getBiomeHolder().is(GleefulTags.GLEEPER_SPAWNS_IN);
         BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> creeper = (m, s) -> s.type().equals(EntityTypes.CREEPER);
 
-        MobSpawnSettings.SpawnerData gleeper = new MobSpawnSettings.SpawnerData(GLEEPER, 4, 4);
+        MobSpawnSettings.SpawnerData gleeper = new MobSpawnSettings.SpawnerData(GLEEPER, new ConstantInt(4));
 
         SpawnPlacements.register(GLEEPER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Gleeper::checkGleeperSpawnRules);
         BiomeModifications.create(at("replace_creepers_in_lush_caves"))

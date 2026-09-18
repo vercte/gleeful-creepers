@@ -101,7 +101,7 @@ publishMods {
     github {
         accessToken = providers.gradleProperty("GITHUB_PUBLISH_TOKEN").orNull
         repository = "vercte/gleeful-creepers"
-        tagName = "26.2/fabric/${project.version}"
-        commitish = "26.2/fabric/dev"
+        tagName = "26.3/fabric/${project.version}"
+        commitish = "26.3/fabric/dev"
     }
 }
